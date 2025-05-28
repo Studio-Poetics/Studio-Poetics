@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Studio Poetics - Coming Soon</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #fefefe;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+            cursor: default;
+        }
+        
+        /* Loading Animation */
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #fefefe;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            transition: opacity 0.8s ease, visibility 0.8s ease;
+        }
+        
+        .loading-screen.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+        
+        .loading-logo {
+            font-size: 2rem;
+            font-weight: 200;
+            color: #000;
+            margin-bottom: 30px;
+            opacity: 0;
+            animation: fadeInScale 1.5s ease-out forwards;
+        }
+        
+        .loading-dots {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .loading-dot {
+            width: 8px;
+            height: 8px;
+            background: #000;
+            border-radius: 50%;
+            opacity: 0.3;
+            animation: dotPulse 1.4s ease-in-out infinite;
+        }
+        
+        .loading-dot:nth-child(1) { animation-delay: 0s; }
+        .loading-dot:nth-child(2) { animation-delay: 0.2s; }
+        .loading-dot:nth-child(3) { animation-delay: 0.4s; }
+        
+        .loading-text {
+            font-size: 0.8rem;
+            color: #666;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            opacity: 0;
+            animation: fadeIn 1s ease-out 0.5s forwards;
+        }
+        
+        @keyframes fadeInScale {
+            0% {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+        
+        @keyframes dotPulse {
+            0%, 80%, 100% {
+                opacity: 0.3;
+                transform: scale(1);
+            }
+            40% {
+                opacity: 1;
+                transform: scale(1.2);
+            }
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        /* Custom Cursor */
+        .cursor {
+            position: fixed;
+            width: 20px;
+            height: 20px;
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9999;
+            transition: transform 0.1s ease;
+            mix-blend-mode: difference;
+        }
+        
+        .cursor-follower {
+            position: fixed;
+            width: 40px;
+            height: 40px;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9998;
+            transition: all 0.3s ease;
+            transform: translate(-50%, -50%);
+        }
+        
+        .cursor.hover {
+            transform: scale(1.5);
+            background: rgba(0, 0, 0, 0.2);
+        }
+        
+        .cursor-follower.hover {
+            transform: translate(-50%, -50%) scale(1.5);
+            border-color: rgba(0, 0, 0, 0.3);
+        }
+        
+        /* Geometric Background Elements */
+        .geometric-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+            overflow: hidden;
+        }
+        
+        .geo-element {
+            position: absolute;
+            opacity: 0.03;
+        }
+        
+        .geo-circle {
+            border: 1px solid #000;
+            border-radius: 50%;
+            animation: rotate 60s linear infinite;
+        }
+        
+        .geo-circle:nth-child(1) {
+            width: 400px;
+            height: 400px;
+            top: -200px;
+            right: -200px;
+            animation-delay: 0s;
+        }
+        
+        .geo-circle:nth-child(2) {
+            width: 300px;
+            height: 300px;
+            bottom: -150px;
+            left: -150px;
+            animation-delay: -20s;
+            animation-direction: reverse;
+        }
+        
+        .geo-circle:nth-child(3) {
+            width: 200px;
+            height: 200px;
+            top: 20%;
+            left: 10%;
+            animation-delay: -40s;
+        }
+        
+        .geo-line {
+            background: #000;
+            animation: float 45s ease-in-out infinite;
+        }
+        
+        .geo-line:nth-child(4) {
+            width: 300px;
+            height: 1px;
+            top: 15%;
+            right: 20%;
+            transform: rotate(30deg);
+            animation-delay: -10s;
+        }
+        
+        .geo-line:nth-child(5) {
+            width: 200px;
+            height: 1px;
+            bottom: 30%;
+            left: 15%;
+            transform: rotate(-20deg);
+            animation-delay: -25s;
+        }
+        
+        .geo-line:nth-child(6) {
+            width: 150px;
+            height: 1px;
+            top: 60%;
+            right: 10%;
+            transform: rotate(45deg);
+            animation-delay: -35s;
+        }
+        
+        .geo-square {
+            border: 1px solid #000;
+            animation: pulse 40s ease-in-out infinite;
+        }
+        
+        .geo-square:nth-child(7) {
+            width: 60px;
+            height: 60px;
+            top: 25%;
+            right: 25%;
+            transform: rotate(45deg);
+            animation-delay: -15s;
+        }
+        
+        .geo-square:nth-child(8) {
+            width: 40px;
+            height: 40px;
+            bottom: 45%;
+            left: 20%;
+            transform: rotate(30deg);
+            animation-delay: -30s;
+        }
+        
+        .geo-triangle {
+            width: 0;
+            height: 0;
+            animation: drift 50s ease-in-out infinite;
+        }
+        
+        .geo-triangle:nth-child(9) {
+            border-left: 20px solid transparent;
+            border-right: 20px solid transparent;
+            border-bottom: 35px solid #000;
+            top: 40%;
+            right: 40%;
+            animation-delay: -20s;
+        }
+        
+        .geo-triangle:nth-child(10) {
+            border-left: 15px solid transparent;
+            border-right: 15px solid transparent;
+            border-bottom: 25px solid #000;
+            bottom: 20%;
+            left: 40%;
+            transform: rotate(180deg);
+            animation-delay: -45s;
+        }
+        
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        @keyframes float {
+            0%, 100% { 
+                opacity: 0.02; 
+                transform: translateY(0px) rotate(var(--rotation, 0deg)); 
+            }
+            50% { 
+                opacity: 0.06; 
+                transform: translateY(-30px) rotate(calc(var(--rotation, 0deg) + 10deg)); 
+            }
+        }
+        
+        @keyframes pulse {
+            0%, 100% { 
+                opacity: 0.02; 
+                transform: scale(1) rotate(var(--rotation, 0deg)); 
+            }
+            50% { 
+                opacity: 0.08; 
+                transform: scale(1.1) rotate(calc(var(--rotation, 0deg) + 15deg)); 
+            }
+        }
+        
+        @keyframes drift {
+            0%, 100% { 
+                opacity: 0.03; 
+                transform: translateX(0px) translateY(0px) rotate(var(--rotation, 0deg)); 
+            }
+            33% { 
+                opacity: 0.06; 
+                transform: translateX(20px) translateY(-15px) rotate(calc(var(--rotation, 0deg) + 20deg)); 
+            }
+            66% { 
+                opacity: 0.04; 
+                transform: translateX(-15px) translateY(10px) rotate(calc(var(--rotation, 0deg) - 10deg)); 
+            }
+        }
+        
+        /* Main Container */
+        .container {
+            position: relative;
+            z-index: 10;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 40px 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+            opacity: 0;
+            animation: fadeInUp 1s ease-out 0.5s forwards;
+        }
+        
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 80px;
+        }
+        
+        .logo {
+            position: relative;
+            margin-bottom: 30px;
+        }
+        
+        .logo h1 {
+            font-size: clamp(3rem, 8vw, 5rem);
+            font-weight: 200;
+            color: #000;
+            letter-spacing: -0.02em;
+            margin-bottom: 20px;
+            position: relative;
+        }
+        
+        .logo h1::after {
+            content: '';
+            position: absolute;
+            bottom: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 1px;
+            background: #000;
+            opacity: 0.3;
+        }
+        
+        .tagline {
+            font-size: 0.75rem;
+            color: #666;
+            font-weight: 300;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            position: relative;
+            display: inline-block;
+            padding: 0 40px;
+        }
+        
+        .tagline::before,
+        .tagline::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            width: 30px;
+            height: 1px;
+            background: #ccc;
+        }
+        
+        .tagline::before { left: 0; }
+        .tagline::after { right: 0; }
+        
+        /* Content */
+        .content {
+            text-align: center;
+            margin-bottom: 80px;
+        }
+        
+        .message {
+            font-size: 1.1rem;
+            color: #333;
+            line-height: 1.8;
+            margin-bottom: 60px;
+            font-weight: 300;
+            max-width: 500px;
+            position: relative;
+        }
+        
+        /* Countdown */
+        .countdown {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 30px;
+            margin-bottom: 60px;
+            max-width: 600px;
+            width: 100%;
+        }
+        
+        .time-unit {
+            background: rgba(255, 255, 255, 0.8);
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            padding: 40px 20px;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            cursor: pointer;
+        }
+        
+        .time-unit::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 0, 0, 0.02), transparent);
+            transition: left 0.6s ease;
+        }
+        
+        .time-unit:hover::before {
+            left: 100%;
+        }
+        
+        .time-unit:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            border-color: rgba(0, 0, 0, 0.15);
+        }
+        
+        .time-number {
+            display: block;
+            font-size: 2.5rem;
+            font-weight: 200;
+            color: #000;
+            line-height: 1;
+            margin-bottom: 15px;
+        }
+        
+        .time-label {
+            font-size: 0.7rem;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            font-weight: 400;
+        }
+        
+        /* Footer */
+        .footer {
+            text-align: center;
+            position: relative;
+        }
+        
+        .footer::before {
+            content: '';
+            position: absolute;
+            top: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 1px;
+            background: rgba(0, 0, 0, 0.2);
+        }
+        
+        .contact-info {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 25px;
+            font-weight: 300;
+        }
+        
+        .contact-links {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .email-link {
+            color: #000;
+            text-decoration: none;
+            font-weight: 300;
+            font-size: 0.9rem;
+            padding: 15px 25px;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            background: rgba(255, 255, 255, 0.5);
+            transition: all 0.3s ease;
+            letter-spacing: 0.02em;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+        }
+        
+        .email-link::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.02);
+            transition: left 0.3s ease;
+        }
+        
+        .email-link:hover::before {
+            left: 0;
+        }
+        
+        .email-link:hover {
+            transform: translateY(-3px);
+            border-color: rgba(0, 0, 0, 0.2);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .instagram-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 50px;
+            height: 50px;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            background: rgba(255, 255, 255, 0.5);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        
+        .instagram-link::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.02);
+            transition: left 0.3s ease;
+        }
+        
+        .instagram-link:hover::before {
+            left: 0;
+        }
+        
+        .instagram-link:hover {
+            transform: translateY(-3px);
+            border-color: rgba(0, 0, 0, 0.2);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .instagram-icon {
+            width: 20px;
+            height: 20px;
+            fill: #000;
+            transition: transform 0.3s ease;
+        }
+        
+        .instagram-link:hover .instagram-icon {
+            transform: scale(1.1);
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px 15px;
+            }
+            
+            .header {
+                margin-bottom: 60px;
+            }
+            
+            .content {
+                margin-bottom: 60px;
+            }
+            
+            .countdown {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 20px;
+            }
+            
+            .time-unit {
+                padding: 30px 15px;
+            }
+            
+            .time-number {
+                font-size: 2rem;
+            }
+            
+            .contact-links {
+                gap: 20px;
+            }
+            
+            .tagline::before,
+            .tagline::after {
+                width: 20px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .countdown {
+                grid-template-columns: 1fr 1fr;
+                gap: 15px;
+            }
+            
+            .time-unit {
+                padding: 25px 10px;
+            }
+            
+            .time-number {
+                font-size: 1.8rem;
+            }
+            
+            .contact-links {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loading-logo">Studio Poetics</div>
+        <div class="loading-dots">
+            <div class="loading-dot"></div>
+            <div class="loading-dot"></div>
+            <div class="loading-dot"></div>
+        </div>
+        <div class="loading-text">Crafting Beauty</div>
+    </div>
+    
+    <!-- Custom Cursor -->
+    <div class="cursor" id="cursor"></div>
+    <div class="cursor-follower" id="cursorFollower"></div>
+    
+    <!-- Geometric Background -->
+    <div class="geometric-bg">
+        <div class="geo-element geo-circle"></div>
+        <div class="geo-element geo-circle"></div>
+        <div class="geo-element geo-circle"></div>
+        <div class="geo-element geo-line"></div>
+        <div class="geo-element geo-line"></div>
+        <div class="geo-element geo-line"></div>
+        <div class="geo-element geo-square"></div>
+        <div class="geo-element geo-square"></div>
+        <div class="geo-element geo-triangle"></div>
+        <div class="geo-element geo-triangle"></div>
+    </div>
+    
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <h1>Studio Poetics</h1>
+                <div class="tagline">Coming Soon</div>
+            </div>
+        </header>
+        
+        <!-- Content -->
+        <main class="content">
+            <p class="message">
+                We're crafting something beautiful and meaningful.<br>
+                Our creative studio will be live soon.
+            </p>
+            
+            <div class="countdown" id="countdown">
+                <div class="time-unit">
+                    <span class="time-number" id="days">00</span>
+                    <span class="time-label">Days</span>
+                </div>
+                <div class="time-unit">
+                    <span class="time-number" id="hours">00</span>
+                    <span class="time-label">Hours</span>
+                </div>
+                <div class="time-unit">
+                    <span class="time-number" id="minutes">00</span>
+                    <span class="time-label">Minutes</span>
+                </div>
+                <div class="time-unit">
+                    <span class="time-number" id="seconds">00</span>
+                    <span class="time-label">Seconds</span>
+                </div>
+            </div>
+        </main>
+        
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="contact-info">
+                Questions? Reach out to us
+            </div>
+            <div class="contact-links">
+                <a href="mailto:pranshu@poetics.studio" class="email-link">
+                    pranshu@poetics.studio
+                </a>
+                <a href="https://instagram.com/studio.poetics" target="_blank" rel="noopener noreferrer" class="instagram-link">
+                    <svg class="instagram-icon" viewBox="0 0 24 24">
+                        <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                    </svg>
+                </a>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Loading Animation
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                document.getElementById('loadingScreen').classList.add('hidden');
+            }, 2000); // Show loading for 2 seconds
+        });
+        
+        // Custom Cursor
+        const cursor = document.getElementById('cursor');
+        const cursorFollower = document.getElementById('cursorFollower');
+        let mouseX = 0;
+        let mouseY = 0;
+        let followerX = 0;
+        let followerY = 0;
+        
+        document.addEventListener('mousemove', function(e) {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+            
+            cursor.style.left = mouseX - 10 + 'px';
+            cursor.style.top = mouseY - 10 + 'px';
+        });
+        
+        // Smooth follower animation
+        function animateFollower() {
+            followerX += (mouseX - followerX) * 0.1;
+            followerY += (mouseY - followerY) * 0.1;
+            
+            cursorFollower.style.left = followerX + 'px';
+            cursorFollower.style.top = followerY + 'px';
+            
+            requestAnimationFrame(animateFollower);
+        }
+        animateFollower();
+        
+        // Cursor hover effects
+        const hoverElements = document.querySelectorAll('.time-unit, .email-link, .instagram-link');
+        
+        hoverElements.forEach(function(element) {
+            element.addEventListener('mouseenter', function() {
+                cursor.classList.add('hover');
+                cursorFollower.classList.add('hover');
+            });
+            
+            element.addEventListener('mouseleave', function() {
+                cursor.classList.remove('hover');
+                cursorFollower.classList.remove('hover');
+            });
+        });
+        
+        // Hide cursor when leaving window
+        document.addEventListener('mouseleave', function() {
+            cursor.style.opacity = '0';
+            cursorFollower.style.opacity = '0';
+        });
+        
+        document.addEventListener('mouseenter', function() {
+            cursor.style.opacity = '1';
+            cursorFollower.style.opacity = '1';
+        });
+        
+        // Countdown Timer
+        const launchDate = new Date('June 1, 2025 00:00:00').getTime();
+        
+        function updateCountdown() {
+            const now = new Date().getTime();
+            const distance = launchDate - now;
+            
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+            
+            document.getElementById('days').textContent = days.toString().padStart(2, '0');
+            document.getElementById('hours').textContent = hours.toString().padStart(2, '0');
+            document.getElementById('minutes').textContent = minutes.toString().padStart(2, '0');
+            document.getElementById('seconds').textContent = seconds.toString().padStart(2, '0');
+            
+            if (distance < 0) {
+                document.getElementById('countdown').innerHTML = '<div class="time-unit"><span class="time-number">🎉</span><span class="time-label">We\'re Live!</span></div>';
+            }
+        }
+        
+        updateCountdown();
+        setInterval(updateCountdown, 1000);
+        
+        // Parallax effect for geometric elements
+        document.addEventListener('mousemove', function(e) {
+            const mouseX = e.clientX / window.innerWidth;
+            const mouseY = e.clientY / window.innerHeight;
+            
+            const geoElements = document.querySelectorAll('.geo-element');
+            geoElements.forEach(function(element, index) {
+                const speed = (index + 1) * 0.5;
+                const x = (mouseX - 0.5) * speed;
+                const y = (mouseY - 0.5) * speed;
+                
+                element.style.transform += ' translate(' + x + 'px, ' + y + 'px)';
+            });
+        });
+    </script>
+</body>
+</html>
