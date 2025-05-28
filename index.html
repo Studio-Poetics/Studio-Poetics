@@ -376,28 +376,23 @@
             position: relative;
         }
         
-        /* Countdown */
-        .countdown {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-            gap: 30px;
-            margin-bottom: 60px;
-            max-width: 600px;
-            width: 100%;
-        }
-        
-        .time-unit {
+        /* Launch Date Card */
+        .launch-date {
             background: rgba(255, 255, 255, 0.8);
             border: 1px solid rgba(0, 0, 0, 0.08);
-            padding: 40px 20px;
-            transition: all 0.4s ease;
+            padding: 40px 30px;
+            border-radius: 8px;
+            backdrop-filter: blur(10px);
+            margin-bottom: 60px;
+            max-width: 450px;
+            width: 100%;
+            cursor: pointer;
+            transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
-            backdrop-filter: blur(10px);
-            cursor: pointer;
         }
         
-        .time-unit::before {
+        .launch-date::before {
             content: '';
             position: absolute;
             top: 0;
@@ -408,31 +403,39 @@
             transition: left 0.6s ease;
         }
         
-        .time-unit:hover::before {
+        .launch-date:hover::before {
             left: 100%;
         }
         
-        .time-unit:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        .launch-date:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
             border-color: rgba(0, 0, 0, 0.15);
         }
         
-        .time-number {
-            display: block;
-            font-size: 2.5rem;
-            font-weight: 200;
-            color: #000;
-            line-height: 1;
-            margin-bottom: 15px;
-        }
-        
-        .time-label {
-            font-size: 0.7rem;
+        .launch-text {
+            font-size: 0.8rem;
             color: #666;
             text-transform: uppercase;
             letter-spacing: 0.1em;
+            margin-bottom: 20px;
             font-weight: 400;
+        }
+        
+        .launch-date-main {
+            font-size: 2.2rem;
+            font-weight: 200;
+            color: #000;
+            line-height: 1.2;
+            margin-bottom: 15px;
+            letter-spacing: -0.01em;
+        }
+        
+        .launch-subtitle {
+            font-size: 1rem;
+            color: #666;
+            font-weight: 300;
+            line-height: 1.5;
         }
         
         /* Footer */
@@ -480,6 +483,7 @@
             position: relative;
             overflow: hidden;
             cursor: pointer;
+            border-radius: 4px;
         }
         
         .email-link::before {
@@ -516,6 +520,7 @@
             overflow: hidden;
             cursor: pointer;
             text-decoration: none;
+            border-radius: 4px;
         }
         
         .instagram-link::before {
@@ -645,7 +650,7 @@
             }
         }
         
-        /* Responsive Design */
+        /* Mobile Responsive Design */
         @media (max-width: 768px) {
             .container {
                 padding: 20px 15px;
@@ -659,17 +664,13 @@
                 margin-bottom: 60px;
             }
             
-            .countdown {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 20px;
+            .launch-date {
+                padding: 30px 20px;
+                margin-bottom: 50px;
             }
             
-            .time-unit {
-                padding: 30px 15px;
-            }
-            
-            .time-number {
-                font-size: 2rem;
+            .launch-date-main {
+                font-size: 1.8rem;
             }
             
             .contact-links {
@@ -680,25 +681,39 @@
             .tagline::after {
                 width: 20px;
             }
+            
+            /* Hide cursor on mobile */
+            .cursor {
+                display: none;
+            }
+            
+            body {
+                cursor: auto;
+            }
         }
         
         @media (max-width: 480px) {
-            .countdown {
-                grid-template-columns: 1fr 1fr;
-                gap: 15px;
+            .launch-date {
+                padding: 25px 15px;
+                margin-bottom: 40px;
             }
             
-            .time-unit {
-                padding: 25px 10px;
+            .launch-date-main {
+                font-size: 1.6rem;
             }
             
-            .time-number {
-                font-size: 1.8rem;
+            .launch-subtitle {
+                font-size: 0.9rem;
             }
             
             .contact-links {
                 flex-direction: column;
                 gap: 15px;
+            }
+            
+            .email-link {
+                padding: 12px 20px;
+                font-size: 0.85rem;
             }
         }
     </style>
@@ -752,23 +767,11 @@
                 Our creative studio will be live soon.
             </p>
             
-            <div class="countdown" id="countdown">
-                <div class="time-unit">
-                    <span class="time-number" id="days">00</span>
-                    <span class="time-label">Days</span>
-                </div>
-                <div class="time-unit">
-                    <span class="time-number" id="hours">00</span>
-                    <span class="time-label">Hours</span>
-                </div>
-                <div class="time-unit">
-                    <span class="time-number" id="minutes">00</span>
-                    <span class="time-label">Minutes</span>
-                </div>
-                <div class="time-unit">
-                    <span class="time-number" id="seconds">00</span>
-                    <span class="time-label">Seconds</span>
-                </div>
+            <!-- Launch Date Card -->
+            <div class="launch-date">
+                <div class="launch-text">Mark Your Calendar</div>
+                <div class="launch-date-main">31st May 2025</div>
+                <div class="launch-subtitle">The new site will be live</div>
             </div>
         </main>
         
@@ -806,78 +809,54 @@
             let cursorX = 0;
             let cursorY = 0;
             
-            // Track mouse movement
-            document.addEventListener('mousemove', function(e) {
-                mouseX = e.clientX;
-                mouseY = e.clientY;
-            });
-            
-            // Smooth cursor animation
-            function animateCursor() {
-                // Smooth easing
-                const ease = 0.15;
-                const dx = mouseX - cursorX;
-                const dy = mouseY - cursorY;
-                
-                cursorX += dx * ease;
-                cursorY += dy * ease;
-                
-                cursor.style.transform = `translate(${cursorX - 6}px, ${cursorY - 6}px)`;
-                
-                requestAnimationFrame(animateCursor);
-            }
-            
-            // Start animation
-            animateCursor();
-            
-            // Add hover effect to interactive elements
-            const hoverElements = document.querySelectorAll('h1, .time-unit, .email-link, .instagram-link');
-            
-            hoverElements.forEach(function(element) {
-                element.addEventListener('mouseenter', function() {
-                    cursor.classList.add('hover');
+            // Only run cursor on desktop
+            if (window.innerWidth > 768) {
+                // Track mouse movement
+                document.addEventListener('mousemove', function(e) {
+                    mouseX = e.clientX;
+                    mouseY = e.clientY;
                 });
                 
-                element.addEventListener('mouseleave', function() {
-                    cursor.classList.remove('hover');
-                });
-            });
-            
-            // Hide cursor when leaving window
-            document.addEventListener('mouseleave', function() {
-                cursor.style.opacity = '0';
-            });
-            
-            document.addEventListener('mouseenter', function() {
-                cursor.style.opacity = '1';
-            });
-        })();
-        
-        // Countdown Timer
-        (function() {
-            const launchDate = new Date('June 1, 2025 00:00:00').getTime();
-            
-            function updateCountdown() {
-                const now = new Date().getTime();
-                const distance = launchDate - now;
-                
-                const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-                
-                document.getElementById('days').textContent = days.toString().padStart(2, '0');
-                document.getElementById('hours').textContent = hours.toString().padStart(2, '0');
-                document.getElementById('minutes').textContent = minutes.toString().padStart(2, '0');
-                document.getElementById('seconds').textContent = seconds.toString().padStart(2, '0');
-                
-                if (distance < 0) {
-                    document.getElementById('countdown').innerHTML = '<div class="time-unit"><span class="time-number">🎉</span><span class="time-label">We\'re Live!</span></div>';
+                // Smooth cursor animation
+                function animateCursor() {
+                    // Smooth easing
+                    const ease = 0.15;
+                    const dx = mouseX - cursorX;
+                    const dy = mouseY - cursorY;
+                    
+                    cursorX += dx * ease;
+                    cursorY += dy * ease;
+                    
+                    cursor.style.transform = `translate(${cursorX - 6}px, ${cursorY - 6}px)`;
+                    
+                    requestAnimationFrame(animateCursor);
                 }
+                
+                // Start animation
+                animateCursor();
+                
+                // Add hover effect to interactive elements
+                const hoverElements = document.querySelectorAll('h1, .launch-date, .email-link, .instagram-link');
+                
+                hoverElements.forEach(function(element) {
+                    element.addEventListener('mouseenter', function() {
+                        cursor.classList.add('hover');
+                    });
+                    
+                    element.addEventListener('mouseleave', function() {
+                        cursor.classList.remove('hover');
+                    });
+                });
+                
+                // Hide cursor when leaving window
+                document.addEventListener('mouseleave', function() {
+                    cursor.style.opacity = '0';
+                });
+                
+                document.addEventListener('mouseenter', function() {
+                    cursor.style.opacity = '1';
+                });
             }
-            
-            updateCountdown();
-            setInterval(updateCountdown, 1000);
         })();
     </script>
 </body>
