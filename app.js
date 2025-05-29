@@ -2,7 +2,109 @@
 
 import React from "react"
 
-// Circle Spotlight App - Fully Fixed for CDN React
+// Circle Spotlight App - Production Ready
+
+// Enhanced mobile detection
+function detectMobile() {
+  const userAgent = navigator.userAgent || navigator.vendor || window.opera
+  const isMobileUA = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(userAgent)
+  const hasTouchScreen = "ontouchstart" in window || navigator.maxTouchPoints > 0
+  const isSmallScreen = window.innerWidth <= 768
+
+  return isMobileUA || (hasTouchScreen && isSmallScreen)
+}
+
+// Enhanced error handling
+function showError(message, duration = 5000) {
+  const errorDiv = document.createElement("div")
+  errorDiv.className = "error-message fixed top-4 left-1/2 transform -translate-x-1/2 z-50"
+  errorDiv.textContent = message
+  errorDiv.style.transform = "translateX(-50%)"
+  errorDiv.style.left = "50%"
+
+  document.body.appendChild(errorDiv)
+
+  setTimeout(() => {
+    if (errorDiv.parentNode) {
+      errorDiv.parentNode.removeChild(errorDiv)
+    }
+  }, duration)
+}
+
+function showSuccess(message, duration = 3000) {
+  const successDiv = document.createElement("div")
+  successDiv.className = "success-message fixed top-4 left-1/2 transform -translate-x-1/2 z-50"
+  successDiv.textContent = message
+  successDiv.style.transform = "translateX(-50%)"
+  successDiv.style.left = "50%"
+
+  document.body.appendChild(successDiv)
+
+  setTimeout(() => {
+    if (successDiv.parentNode) {
+      successDiv.parentNode.removeChild(successDiv)
+    }
+  }, duration)
+}
+
+// Image loading with proper error handling and loading states
+function loadImageWithFeedback(src, onLoad, onError, onLoadStart) {
+  if (onLoadStart) onLoadStart()
+
+  const img = new Image()
+  img.crossOrigin = "anonymous"
+
+  img.onload = () => {
+    if (onLoad) onLoad(img)
+  }
+
+  img.onerror = () => {
+    const errorMsg = "Failed to load image. Please check your internet connection and try again."
+    showError(errorMsg)
+    if (onError) onError(errorMsg)
+  }
+
+  img.src = src
+  return img
+}
+
+// Touch indicator cleanup manager
+class TouchIndicatorManager {
+  constructor() {
+    this.indicators = []
+  }
+
+  create(x, y) {
+    const indicator = document.createElement("div")
+    indicator.className = "touch-point"
+    indicator.style.left = x + "px"
+    indicator.style.top = y + "px"
+    indicator.setAttribute("aria-hidden", "true")
+    document.body.appendChild(indicator)
+    this.indicators.push(indicator)
+    return indicator
+  }
+
+  clear() {
+    this.indicators.forEach((indicator) => {
+      if (indicator.parentNode) {
+        indicator.parentNode.removeChild(indicator)
+      }
+    })
+    this.indicators = []
+  }
+
+  update(index, x, y) {
+    if (this.indicators[index]) {
+      this.indicators[index].style.left = x + "px"
+      this.indicators[index].style.top = y + "px"
+    }
+  }
+
+  destroy() {
+    this.clear()
+  }
+}
 
 // Main App Component
 function App() {
@@ -17,110 +119,182 @@ function App() {
   const [savedImages, setSavedImages] = React.useState([])
   const [showImageGallery, setShowImageGallery] = React.useState(false)
   const [showUI, setShowUI] = React.useState(true)
+  const [isImageLoading, setIsImageLoading] = React.useState(false)
+  const [imageLoadError, setImageLoadError] = React.useState(null)
 
-  // Inactivity timer ref
+  // Refs for cleanup
   const inactivityTimerRef = React.useRef(null)
+  const touchManagerRef = React.useRef(null)
+  const animationFrameRef = React.useRef(null)
+
+  // Initialize touch manager
+  React.useEffect(() => {
+    touchManagerRef.current = new TouchIndicatorManager()
+    return () => {
+      if (touchManagerRef.current) {
+        touchManagerRef.current.destroy()
+      }
+    }
+  }, [])
+
+  // Enhanced mobile detection
+  React.useEffect(() => {
+    setIsMobile(detectMobile())
+
+    // Listen for orientation changes
+    const handleOrientationChange = () => {
+      setTimeout(() => setIsMobile(detectMobile()), 100)
+    }
+
+    window.addEventListener("orientationchange", handleOrientationChange)
+    window.addEventListener("resize", handleOrientationChange)
+
+    return () => {
+      window.removeEventListener("orientationchange", handleOrientationChange)
+      window.removeEventListener("resize", handleOrientationChange)
+    }
+  }, [])
 
   // Load saved images from localStorage on mount
   React.useEffect(() => {
-    const saved = localStorage.getItem("circle-spotlight-images")
-    if (saved) {
-      try {
-        setSavedImages(JSON.parse(saved))
-      } catch (error) {
-        console.error("Error loading saved images:", error)
+    try {
+      const saved = localStorage.getItem("circle-spotlight-images")
+      if (saved) {
+        const parsedImages = JSON.parse(saved)
+        setSavedImages(Array.isArray(parsedImages) ? parsedImages : [])
       }
+    } catch (error) {
+      console.error("Error loading saved images:", error)
+      showError("Failed to load saved images from storage")
     }
   }, [])
 
   // Save images to localStorage whenever savedImages changes
   React.useEffect(() => {
-    localStorage.setItem("circle-spotlight-images", JSON.stringify(savedImages))
+    try {
+      localStorage.setItem("circle-spotlight-images", JSON.stringify(savedImages))
+    } catch (error) {
+      console.error("Error saving images:", error)
+      showError("Failed to save images to storage")
+    }
   }, [savedImages])
 
-  const createThumbnail = (file) => {
-    return new Promise((resolve) => {
+  const createThumbnail = React.useCallback((file) => {
+    return new Promise((resolve, reject) => {
       const canvas = document.createElement("canvas")
       const ctx = canvas.getContext("2d")
       const img = new Image()
 
       img.onload = () => {
-        canvas.width = 100
-        canvas.height = 100
+        try {
+          canvas.width = 100
+          canvas.height = 100
 
-        if (ctx) {
-          const size = Math.min(img.width, img.height)
-          const x = (img.width - size) / 2
-          const y = (img.height - size) / 2
+          if (ctx) {
+            const size = Math.min(img.width, img.height)
+            const x = (img.width - size) / 2
+            const y = (img.height - size) / 2
 
-          ctx.drawImage(img, x, y, size, size, 0, 0, 100, 100)
-          resolve(canvas.toDataURL("image/jpeg", 0.7))
+            ctx.drawImage(img, x, y, size, size, 0, 0, 100, 100)
+            resolve(canvas.toDataURL("image/jpeg", 0.7))
+          } else {
+            reject(new Error("Failed to get canvas context"))
+          }
+        } catch (error) {
+          reject(error)
         }
+      }
+
+      img.onerror = () => {
+        reject(new Error("Failed to load image for thumbnail"))
       }
 
       img.src = URL.createObjectURL(file)
     })
-  }
+  }, [])
 
-  const handleImageUpload = async (event) => {
-    const file = event.target.files?.[0]
-    if (!file) return
+  const handleImageUpload = React.useCallback(
+    async (event) => {
+      const file = event.target.files?.[0]
+      if (!file) return
 
-    if (!file.type.startsWith("image/")) {
-      alert("Please select an image file.")
-      return
-    }
-
-    try {
-      const url = URL.createObjectURL(file)
-      const thumbnail = await createThumbnail(file)
-
-      const newImage = {
-        id: Date.now().toString(),
-        name: file.name,
-        url,
-        thumbnail,
+      if (!file.type.startsWith("image/")) {
+        showError("Please select a valid image file (JPEG, PNG, GIF, etc.)")
+        return
       }
 
-      setSavedImages((prev) => [newImage, ...prev])
-      setCurrentImageUrl(url)
-      alert(`${file.name} has been added to your gallery.`)
-    } catch (error) {
-      alert("There was an error uploading your image.")
-    }
-
-    // Reset file input
-    if (fileInputRef.current) {
-      fileInputRef.current.value = ""
-    }
-  }
-
-  const deleteImage = (id) => {
-    setSavedImages((prev) => {
-      const updated = prev.filter((img) => img.id !== id)
-      const deletedImage = prev.find((img) => img.id === id)
-
-      // If we're deleting the current image, switch to default
-      if (deletedImage && currentImageUrl === deletedImage.url) {
-        setCurrentImageUrl(
-          "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
-        )
+      // Check file size (limit to 10MB)
+      if (file.size > 10 * 1024 * 1024) {
+        showError("Image file is too large. Please select an image smaller than 10MB.")
+        return
       }
 
-      return updated
-    })
-    alert("Image has been removed from your gallery.")
-  }
+      try {
+        setIsImageLoading(true)
+        const url = URL.createObjectURL(file)
+        const thumbnail = await createThumbnail(file)
 
-  // Canvas and circle spotlight logic
+        const newImage = {
+          id: Date.now().toString(),
+          name: file.name,
+          url,
+          thumbnail,
+          size: file.size,
+          type: file.type,
+        }
+
+        setSavedImages((prev) => [newImage, ...prev])
+        setCurrentImageUrl(url)
+        showSuccess(`${file.name} has been added to your gallery.`)
+      } catch (error) {
+        console.error("Upload error:", error)
+        showError("There was an error uploading your image. Please try again.")
+      } finally {
+        setIsImageLoading(false)
+        // Reset file input
+        if (fileInputRef.current) {
+          fileInputRef.current.value = ""
+        }
+      }
+    },
+    [createThumbnail],
+  )
+
+  const deleteImage = React.useCallback(
+    (id) => {
+      setSavedImages((prev) => {
+        const updated = prev.filter((img) => img.id !== id)
+        const deletedImage = prev.find((img) => img.id === id)
+
+        // Clean up object URL to prevent memory leaks
+        if (deletedImage && deletedImage.url.startsWith("blob:")) {
+          URL.revokeObjectURL(deletedImage.url)
+        }
+
+        // If we're deleting the current image, switch to default
+        if (deletedImage && currentImageUrl === deletedImage.url) {
+          setCurrentImageUrl(
+            "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
+          )
+        }
+
+        return updated
+      })
+      showSuccess("Image has been removed from your gallery.")
+    },
+    [currentImageUrl],
+  )
+
+  // Canvas and circle spotlight logic with enhanced error handling
   React.useEffect(() => {
-    setIsMobile("ontouchstart" in window)
-
     const canvas = canvasRef.current
     if (!canvas) return
 
     const ctx = canvas.getContext("2d")
-    if (!ctx) return
+    if (!ctx) {
+      showError("Failed to initialize canvas. Your browser may not support this feature.")
+      return
+    }
 
     // Animation state
     let animationStartTime = 0
@@ -137,14 +311,12 @@ function App() {
     let clickTimeout = null
 
     // Inactivity tracking
-    let lastInteractionTime = Date.now()
     let isDisappearing = false
     let disappearStartTime = 0
     const disappearDuration = 1000 // ms for fade out animation
 
     // Reset inactivity timer function
     function resetInactivityTimer() {
-      lastInteractionTime = Date.now()
       isDisappearing = false
 
       // Hide UI when circle is active
@@ -169,33 +341,46 @@ function App() {
     // Particle system for formation effect
     const particles = []
 
-    // Load images
-    const backgroundImg = new Image()
-    backgroundImg.crossOrigin = "anonymous"
-    backgroundImg.src = currentImageUrl
+    // Load images with proper error handling
+    let backgroundImg = null
+    let colorImage = null
 
-    const colorImage = new Image()
-    colorImage.crossOrigin = "anonymous"
-    colorImage.src = currentImageUrl
+    const loadImages = () => {
+      setIsImageLoading(true)
+      setImageLoadError(null)
 
-    // Visual touch indicators
-    const touchIndicators = []
+      // Load background image
+      backgroundImg = loadImageWithFeedback(
+        currentImageUrl,
+        () => {
+          // Background loaded successfully
+          drawScene()
+        },
+        (error) => {
+          setImageLoadError(error)
+          setIsImageLoading(false)
+        },
+      )
 
-    function createTouchIndicator(x, y) {
-      const indicator = document.createElement("div")
-      indicator.className = "touch-point"
-      indicator.style.left = x + "px"
-      indicator.style.top = y + "px"
-      document.body.appendChild(indicator)
-      return indicator
+      // Load color image
+      colorImage = loadImageWithFeedback(
+        currentImageUrl,
+        () => {
+          imageLoaded = true
+          setIsImageLoading(false)
+          drawScene()
+        },
+        (error) => {
+          setImageLoadError(error)
+          setIsImageLoading(false)
+        },
+        () => {
+          setIsImageLoading(true)
+        },
+      )
     }
 
-    function clearTouchIndicators() {
-      touchIndicators.forEach((indicator) => indicator.remove())
-      touchIndicators.length = 0
-    }
-
-    // Easing function for smooth animations
+    // Easing functions for smooth animations
     function easeOutElastic(t) {
       const c4 = (2 * Math.PI) / 3
       return t === 0 ? 0 : t === 1 ? 1 : Math.pow(2, -10 * t) * Math.sin((t * 10 - 0.75) * c4) + 1
@@ -347,7 +532,7 @@ function App() {
       updateCircleAnimation()
       updateParticles()
 
-      if (circle && colorImage.complete && imageLoaded) {
+      if (circle && colorImage && colorImage.complete && imageLoaded) {
         setIsCircleActive(true)
 
         const currentScale = circle.scale || 1
@@ -443,10 +628,9 @@ function App() {
         y: touch.clientY,
       }))
 
-      clearTouchIndicators()
+      touchManagerRef.current?.clear()
       touches.forEach((touch) => {
-        const indicator = createTouchIndicator(touch.x, touch.y)
-        touchIndicators.push(indicator)
+        touchManagerRef.current?.create(touch.x, touch.y)
       })
 
       if (touches.length === 3) {
@@ -475,10 +659,7 @@ function App() {
 
         // Update touch indicators
         newTouches.forEach((touch, i) => {
-          if (touchIndicators[i]) {
-            touchIndicators[i].style.left = touch.x + "px"
-            touchIndicators[i].style.top = touch.y + "px"
-          }
+          touchManagerRef.current?.update(i, touch.x, touch.y)
         })
 
         const centroid = getCentroid(newTouches)
@@ -502,7 +683,7 @@ function App() {
       e.preventDefault()
       if (e.touches.length < 3) {
         isDragging = false
-        clearTouchIndicators()
+        touchManagerRef.current?.clear()
       }
 
       resetInactivityTimer()
@@ -513,14 +694,13 @@ function App() {
       const point = { x: e.clientX, y: e.clientY }
       mouseClicks.push(point)
 
-      const indicator = createTouchIndicator(point.x, point.y)
-      touchIndicators.push(indicator)
+      touchManagerRef.current?.create(point.x, point.y)
 
       // Clear old clicks after 2 seconds
       if (clickTimeout) clearTimeout(clickTimeout)
       clickTimeout = setTimeout(() => {
         mouseClicks = []
-        clearTouchIndicators()
+        touchManagerRef.current?.clear()
       }, 2000)
 
       if (mouseClicks.length === 3) {
@@ -536,7 +716,7 @@ function App() {
         // Reset for next set of clicks
         setTimeout(() => {
           mouseClicks = []
-          clearTouchIndicators()
+          touchManagerRef.current?.clear()
         }, 500)
       }
 
@@ -563,35 +743,21 @@ function App() {
     }
 
     // Animation loop for smooth rendering
-    let animationId
     function animate() {
       drawScene()
-      animationId = requestAnimationFrame(animate)
+      animationFrameRef.current = requestAnimationFrame(animate)
     }
 
     // Setup event listeners
-    canvas.addEventListener("touchstart", handleTouchStart)
-    canvas.addEventListener("touchmove", handleTouchMove)
-    canvas.addEventListener("touchend", handleTouchEnd)
+    canvas.addEventListener("touchstart", handleTouchStart, { passive: false })
+    canvas.addEventListener("touchmove", handleTouchMove, { passive: false })
+    canvas.addEventListener("touchend", handleTouchEnd, { passive: false })
     canvas.addEventListener("mousedown", handleMouseDown)
     canvas.addEventListener("mousemove", handleMouseMove)
     window.addEventListener("resize", resizeCanvas)
 
-    // Redraw when image loads
-    colorImage.onload = () => {
-      imageLoaded = true
-      drawScene()
-    }
-
-    backgroundImg.onload = () => {
-      drawScene()
-    }
-
     // Initial setup
-    if (colorImage.complete) {
-      imageLoaded = true
-    }
-
+    loadImages()
     resizeCanvas()
     animate()
 
@@ -603,86 +769,87 @@ function App() {
       canvas.removeEventListener("mousedown", handleMouseDown)
       canvas.removeEventListener("mousemove", handleMouseMove)
       window.removeEventListener("resize", resizeCanvas)
-      cancelAnimationFrame(animationId)
-      clearTouchIndicators()
+
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current)
+      }
       if (clickTimeout) clearTimeout(clickTimeout)
       if (inactivityTimerRef.current) clearTimeout(inactivityTimerRef.current)
+
+      touchManagerRef.current?.clear()
     }
   }, [currentImageUrl])
 
-  // Gallery component
+  // Gallery component with loading states
   const ImageGallery = () => {
     if (!showImageGallery) return null
 
     return React.createElement(
       "div",
-      { className: "dialog-overlay", onClick: () => setShowImageGallery(false) },
+      {
+        className: "dialog-overlay",
+        onClick: () => setShowImageGallery(false),
+        role: "dialog",
+        "aria-modal": "true",
+        "aria-labelledby": "gallery-title",
+      },
       React.createElement(
         "div",
         { className: "dialog-content", onClick: (e) => e.stopPropagation() },
         React.createElement(
           "div",
-          { style: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" } },
-          React.createElement("h2", null, "Image Gallery"),
+          { className: "flex justify-between items-center mb-4" },
+          React.createElement("h2", { id: "gallery-title", className: "text-xl font-semibold" }, "Image Gallery"),
           React.createElement(
             "button",
             {
               onClick: () => setShowImageGallery(false),
-              style: { background: "none", border: "none", fontSize: "1.5rem", cursor: "pointer", color: "#999" },
+              className: "text-white hover:text-gray-300 text-2xl",
+              "aria-label": "Close gallery",
             },
             "×",
           ),
         ),
         React.createElement(
           "p",
-          { style: { color: "#999", marginBottom: "1rem" } },
+          { className: "text-gray-400 mb-4" },
           "Select an image to use or manage your saved images",
         ),
         React.createElement(
           "div",
-          { style: { height: "400px", overflowY: "auto", padding: "1rem" } },
+          { className: "h-96 overflow-y-auto p-4" },
           React.createElement(
             "div",
-            { style: { display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "1rem" } },
+            { className: "grid grid-cols-3 gap-4" },
             // Default image
             React.createElement(
               "div",
               {
-                style: {
-                  position: "relative",
-                  cursor: "pointer",
-                  borderRadius: "0.5rem",
-                  overflow: "hidden",
-                  border: currentImageUrl.includes("unsplash") ? "2px solid rgb(20, 184, 166)" : "2px solid #333",
-                },
+                className: `relative cursor-pointer rounded-lg overflow-hidden border-2 transition-all ${
+                  currentImageUrl.includes("unsplash")
+                    ? "border-teal-500 ring-2 ring-teal-500/20"
+                    : "border-gray-300 hover:border-gray-400"
+                }`,
                 onClick: () => {
                   setCurrentImageUrl(
                     "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
                   )
                   setShowImageGallery(false)
                 },
+                role: "button",
+                tabIndex: 0,
+                "aria-label": "Select default mountain image",
               },
               React.createElement("img", {
                 src: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80",
-                alt: "Default mountain",
-                style: { width: "100%", height: "100px", objectFit: "cover" },
+                alt: "Default mountain landscape",
+                className: "w-full h-24 object-cover",
+                loading: "lazy",
               }),
               React.createElement(
                 "div",
                 {
-                  style: {
-                    position: "absolute",
-                    bottom: 0,
-                    left: 0,
-                    right: 0,
-                    background: "rgba(0,0,0,0.7)",
-                    color: "white",
-                    padding: "0.25rem",
-                    fontSize: "0.75rem",
-                    whiteSpace: "nowrap",
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                  },
+                  className: "absolute bottom-0 left-0 right-0 bg-black/70 text-white text-sm p-2",
                 },
                 "Default Mountain",
               ),
@@ -693,65 +860,42 @@ function App() {
                 "div",
                 {
                   key: image.id,
-                  style: {
-                    position: "relative",
-                    cursor: "pointer",
-                    borderRadius: "0.5rem",
-                    overflow: "hidden",
-                    border: currentImageUrl === image.url ? "2px solid rgb(20, 184, 166)" : "2px solid #333",
-                  },
+                  className: `relative cursor-pointer rounded-lg overflow-hidden border-2 transition-all ${
+                    currentImageUrl === image.url
+                      ? "border-teal-500 ring-2 ring-teal-500/20"
+                      : "border-gray-300 hover:border-gray-400"
+                  }`,
                   onClick: () => {
                     setCurrentImageUrl(image.url)
                     setShowImageGallery(false)
                   },
+                  role: "button",
+                  tabIndex: 0,
+                  "aria-label": `Select ${image.name}`,
                 },
                 React.createElement("img", {
-                  src: image.thumbnail || "/placeholder.svg",
+                  src: image.thumbnail,
                   alt: image.name,
-                  style: { width: "100%", height: "100px", objectFit: "cover" },
+                  className: "w-full h-24 object-cover",
+                  loading: "lazy",
                 }),
                 React.createElement(
                   "div",
                   {
-                    style: {
-                      position: "absolute",
-                      bottom: 0,
-                      left: 0,
-                      right: 0,
-                      background: "rgba(0,0,0,0.7)",
-                      color: "white",
-                      padding: "0.25rem",
-                      fontSize: "0.75rem",
-                      whiteSpace: "nowrap",
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                    },
+                    className: "absolute bottom-0 left-0 right-0 bg-black/70 text-white text-sm p-2",
                   },
                   image.name,
                 ),
                 React.createElement(
                   "button",
                   {
-                    style: {
-                      position: "absolute",
-                      top: "0.25rem",
-                      right: "0.25rem",
-                      background: "rgba(220, 38, 38, 0.8)",
-                      color: "white",
-                      width: "1.5rem",
-                      height: "1.5rem",
-                      borderRadius: "50%",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      fontSize: "0.75rem",
-                      border: "none",
-                      cursor: "pointer",
-                    },
+                    className:
+                      "absolute top-2 right-2 bg-red-600 hover:bg-red-700 text-white w-6 h-6 rounded-full flex items-center justify-center text-sm transition-colors",
                     onClick: (e) => {
                       e.stopPropagation()
                       deleteImage(image.id)
                     },
+                    "aria-label": `Delete ${image.name}`,
                   },
                   "×",
                 ),
@@ -761,7 +905,7 @@ function App() {
           savedImages.length === 0 &&
             React.createElement(
               "div",
-              { style: { textAlign: "center", color: "#666", padding: "2rem 0" } },
+              { className: "text-center text-gray-500 py-8" },
               "No saved images. Upload some images to get started!",
             ),
         ),
@@ -769,7 +913,7 @@ function App() {
     )
   }
 
-  // Instructions component
+  // Instructions component with accessibility
   const Instructions = () => {
     if (!showInstructions || !showUI) return null
 
@@ -778,57 +922,45 @@ function App() {
       { className: "absolute top-4 left-4 z-20 max-w-sm transition-opacity duration-500" },
       React.createElement(
         "div",
-        { className: "card" },
+        { className: "card", role: "region", "aria-labelledby": "instructions-title" },
         React.createElement(
           "div",
-          { style: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.5rem" } },
+          { className: "flex justify-between items-center mb-2" },
           React.createElement(
             "h2",
-            { style: { display: "flex", alignItems: "center", gap: "0.5rem", fontSize: "1.25rem" } },
-            React.createElement("span", { style: { color: "rgb(20, 184, 166)" } }, "ℹ️"),
+            {
+              id: "instructions-title",
+              className: "text-xl flex items-center gap-2",
+            },
+            React.createElement("span", { "aria-hidden": "true" }, "ℹ️"),
             "Circle Spotlight",
           ),
           React.createElement(
             "button",
             {
               onClick: () => setShowInstructions(false),
-              style: {
-                background: "none",
-                border: "none",
-                borderRadius: "50%",
-                width: "2rem",
-                height: "2rem",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                color: "#999",
-                cursor: "pointer",
-              },
+              className: "text-gray-400 hover:text-white w-8 h-8 rounded-full flex items-center justify-center",
+              "aria-label": "Close instructions",
             },
             "×",
           ),
         ),
         React.createElement(
           "p",
-          { style: { color: "#999", marginBottom: "0.75rem" } },
+          { className: "text-gray-400 mb-4" },
           "Create animated color spotlights in grayscale images",
         ),
         React.createElement(
           "div",
-          { style: { display: "flex", flexDirection: "column", gap: "0.75rem", fontSize: "0.875rem" } },
+          { className: "flex flex-col gap-4 text-sm" },
           React.createElement(
             "div",
             {
-              style: {
-                padding: "0.5rem",
-                background: "rgba(50, 50, 50, 0.5)",
-                borderRadius: "0.375rem",
-                border: "1px solid #444",
-              },
+              className: "p-2 rounded bg-gray-800/50 border border-gray-700",
             },
             React.createElement(
               "h4",
-              { style: { color: "rgb(20, 184, 166)", marginBottom: "0.25rem", fontWeight: 500 } },
+              { className: "font-medium text-teal-400 mb-2" },
               isMobile ? "Mobile Instructions:" : "Desktop Instructions:",
             ),
             React.createElement(
@@ -842,37 +974,48 @@ function App() {
           React.createElement(
             "div",
             {
-              style: {
-                padding: "0.5rem",
-                background: "rgba(30, 58, 138, 0.3)",
-                borderRadius: "0.375rem",
-                border: "1px solid #2563eb",
-              },
+              className: "p-2 rounded bg-blue-800/30 border border-blue-700",
             },
-            React.createElement(
-              "h4",
-              { style: { color: "rgb(96, 165, 250)", marginBottom: "0.25rem", fontWeight: 500 } },
-              "Image Management:",
-            ),
+            React.createElement("h4", { className: "font-medium text-blue-400 mb-2" }, "Image Management:"),
             React.createElement("p", null, "Upload your own images and save them locally for future use"),
           ),
           React.createElement(
             "p",
-            { style: { color: "#ccc" } },
+            { className: "text-gray-300" },
             "Once created, drag to smoothly move the spotlight around the image",
           ),
           React.createElement(
             "p",
-            { style: { color: "rgb(251, 191, 36)" } },
+            { className: "text-yellow-300" },
             "Circle will disappear after 10 seconds of inactivity",
           ),
           isCircleActive &&
             React.createElement(
               "div",
-              { style: { color: "rgb(20, 184, 166)", fontWeight: 500, animation: "pulse 1.5s infinite" } },
+              { className: "text-teal-400 font-medium", "aria-live": "polite" },
               "✓ Circle active! Try moving it around.",
             ),
         ),
+      ),
+    )
+  }
+
+  // Loading overlay
+  const LoadingOverlay = () => {
+    if (!isImageLoading) return null
+
+    return React.createElement(
+      "div",
+      {
+        className: "fixed inset-0 bg-black/50 flex items-center justify-center z-50",
+        role: "status",
+        "aria-label": "Loading image",
+      },
+      React.createElement(
+        "div",
+        { className: "bg-black/80 p-6 rounded-lg flex items-center gap-4" },
+        React.createElement("div", { className: "image-loading" }),
+        React.createElement("span", { className: "text-white" }, "Loading image..."),
       ),
     )
   }
@@ -885,13 +1028,19 @@ function App() {
       "div",
       { className: "absolute inset-0 z-0" },
       React.createElement("img", {
-        src: currentImageUrl || "/placeholder.svg",
-        alt: "Background",
+        src: currentImageUrl,
+        alt: "Background image for spotlight effect",
         className: "w-full h-full object-cover filter grayscale opacity-50",
+        onError: () => setImageLoadError("Failed to load background image"),
       }),
     ),
     // Canvas for interactive elements
-    React.createElement("canvas", { ref: canvasRef, className: "absolute inset-0 z-10 cursor-crosshair" }),
+    React.createElement("canvas", {
+      ref: canvasRef,
+      className: "absolute inset-0 z-10 cursor-crosshair",
+      role: "application",
+      "aria-label": "Interactive spotlight canvas",
+    }),
     // Control buttons - only show when UI is visible
     React.createElement(
       "div",
@@ -906,17 +1055,27 @@ function App() {
         accept: "image/*",
         onChange: handleImageUpload,
         className: "hidden",
+        "aria-label": "Upload image file",
       }),
       React.createElement(
         "button",
-        { onClick: () => fileInputRef.current?.click(), className: "bg-teal-600" },
-        React.createElement("span", { style: { marginRight: "0.5rem" } }, "📤"),
+        {
+          onClick: () => fileInputRef.current?.click(),
+          className: "bg-teal-600 hover:bg-teal-700 text-white transition-colors",
+          disabled: isImageLoading,
+          "aria-label": "Upload new image",
+        },
+        React.createElement("span", { "aria-hidden": "true", className: "mr-2" }, "📤"),
         "Upload Image",
       ),
       React.createElement(
         "button",
-        { onClick: () => setShowImageGallery(true), className: "bg-blue-600" },
-        React.createElement("span", { style: { marginRight: "0.5rem" } }, "🖼️"),
+        {
+          onClick: () => setShowImageGallery(true),
+          className: "bg-blue-600 hover:bg-blue-700 text-white transition-colors",
+          "aria-label": `Open image gallery with ${savedImages.length} saved images`,
+        },
+        React.createElement("span", { "aria-hidden": "true", className: "mr-2" }, "🖼️"),
         `Gallery (${savedImages.length})`,
       ),
     ),
@@ -924,7 +1083,9 @@ function App() {
     React.createElement(Instructions),
     // Image Gallery Dialog
     React.createElement(ImageGallery),
-    // Toggle instructions button when hidden - only show when UI is visible and instructions are disabled
+    // Loading overlay
+    React.createElement(LoadingOverlay),
+    // Toggle instructions button when hidden
     !showInstructions &&
       showUI &&
       React.createElement(
@@ -933,8 +1094,9 @@ function App() {
           className:
             "absolute top-4 left-4 z-20 bg-black/70 hover:bg-black/90 text-white transition-opacity duration-500",
           onClick: () => setShowInstructions(true),
+          "aria-label": "Show instructions",
         },
-        React.createElement("span", { style: { marginRight: "0.5rem" } }, "ℹ️"),
+        React.createElement("span", { "aria-hidden": "true", className: "mr-2" }, "ℹ️"),
         "Show Instructions",
       ),
     // Show a small hint button when UI is hidden
@@ -943,32 +1105,29 @@ function App() {
         "button",
         {
           className:
-            "absolute bottom-4 right-4 z-20 bg-black/30 hover:bg-black/60 text-white h-10 w-10 rounded-full p-0 transition-opacity duration-300 opacity-30 hover:opacity-100",
+            "absolute bottom-4 right-4 z-20 bg-black/30 hover:bg-black/60 text-white h-10 w-10 rounded-full transition-opacity duration-300 opacity-30 hover:opacity-100",
           onClick: () => setShowUI(true),
-          style: {
-            borderRadius: "50%",
-            width: "2.5rem",
-            height: "2.5rem",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            opacity: 0.3,
-            transition: "opacity 0.3s",
-          },
-          onMouseOver: (e) => (e.currentTarget.style.opacity = "1"),
-          onMouseOut: (e) => (e.currentTarget.style.opacity = "0.3"),
+          "aria-label": "Show user interface",
         },
-        "ℹ️",
-        React.createElement("span", { className: "sr-only" }, "Show UI"),
+        React.createElement("span", { "aria-hidden": "true" }, "ℹ️"),
       ),
+    // Error display
+    imageLoadError &&
+      React.createElement("div", { className: "error-message absolute top-20 left-4 right-4 z-50" }, imageLoadError),
   )
 }
 
-// Mount the app using the correct ReactDOM method for CDN version
+// Mount the app using React 18 createRoot
 window.addEventListener("DOMContentLoaded", () => {
   const root = document.getElementById("root")
-  if (root && window.ReactDOM) {
-    // Use ReactDOM.render for React 17 compatibility (CDN version)
+  if (root && window.ReactDOM && window.ReactDOM.createRoot) {
+    // Use React 18 createRoot
+    const reactRoot = window.ReactDOM.createRoot(root)
+    reactRoot.render(React.createElement(App))
+  } else if (root && window.ReactDOM) {
+    // Fallback to React 17 render
     window.ReactDOM.render(React.createElement(App), root)
+  } else {
+    console.error("Failed to mount React app: ReactDOM not available")
   }
 })
