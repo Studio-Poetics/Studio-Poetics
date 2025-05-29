@@ -1,7 +1,5 @@
 "use client"
 
-import React from "react"
-
 // Circle Spotlight App - Production Ready
 
 // Enhanced mobile detection
@@ -108,27 +106,27 @@ class TouchIndicatorManager {
 
 // Main App Component
 function App() {
-  const canvasRef = React.useRef(null)
-  const fileInputRef = React.useRef(null)
-  const [showInstructions, setShowInstructions] = React.useState(true)
-  const [isMobile, setIsMobile] = React.useState(false)
-  const [isCircleActive, setIsCircleActive] = React.useState(false)
-  const [currentImageUrl, setCurrentImageUrl] = React.useState(
+  const canvasRef = window.React.useRef(null)
+  const fileInputRef = window.React.useRef(null)
+  const [showInstructions, setShowInstructions] = window.React.useState(true)
+  const [isMobile, setIsMobile] = window.React.useState(false)
+  const [isCircleActive, setIsCircleActive] = window.React.useState(false)
+  const [currentImageUrl, setCurrentImageUrl] = window.React.useState(
     "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
   )
-  const [savedImages, setSavedImages] = React.useState([])
-  const [showImageGallery, setShowImageGallery] = React.useState(false)
-  const [showUI, setShowUI] = React.useState(true)
-  const [isImageLoading, setIsImageLoading] = React.useState(false)
-  const [imageLoadError, setImageLoadError] = React.useState(null)
+  const [savedImages, setSavedImages] = window.React.useState([])
+  const [showImageGallery, setShowImageGallery] = window.React.useState(false)
+  const [showUI, setShowUI] = window.React.useState(true)
+  const [isImageLoading, setIsImageLoading] = window.React.useState(false)
+  const [imageLoadError, setImageLoadError] = window.React.useState(null)
 
   // Refs for cleanup
-  const inactivityTimerRef = React.useRef(null)
-  const touchManagerRef = React.useRef(null)
-  const animationFrameRef = React.useRef(null)
+  const inactivityTimerRef = window.React.useRef(null)
+  const touchManagerRef = window.React.useRef(null)
+  const animationFrameRef = window.React.useRef(null)
 
   // Initialize touch manager
-  React.useEffect(() => {
+  window.React.useEffect(() => {
     touchManagerRef.current = new TouchIndicatorManager()
     return () => {
       if (touchManagerRef.current) {
@@ -138,7 +136,7 @@ function App() {
   }, [])
 
   // Enhanced mobile detection
-  React.useEffect(() => {
+  window.React.useEffect(() => {
     setIsMobile(detectMobile())
 
     // Listen for orientation changes
@@ -156,7 +154,7 @@ function App() {
   }, [])
 
   // Load saved images from localStorage on mount
-  React.useEffect(() => {
+  window.React.useEffect(() => {
     try {
       const saved = localStorage.getItem("circle-spotlight-images")
       if (saved) {
@@ -170,7 +168,7 @@ function App() {
   }, [])
 
   // Save images to localStorage whenever savedImages changes
-  React.useEffect(() => {
+  window.React.useEffect(() => {
     try {
       localStorage.setItem("circle-spotlight-images", JSON.stringify(savedImages))
     } catch (error) {
@@ -179,7 +177,7 @@ function App() {
     }
   }, [savedImages])
 
-  const createThumbnail = React.useCallback((file) => {
+  const createThumbnail = window.React.useCallback((file) => {
     return new Promise((resolve, reject) => {
       const canvas = document.createElement("canvas")
       const ctx = canvas.getContext("2d")
@@ -213,7 +211,7 @@ function App() {
     })
   }, [])
 
-  const handleImageUpload = React.useCallback(
+  const handleImageUpload = window.React.useCallback(
     async (event) => {
       const file = event.target.files?.[0]
       if (!file) return
@@ -260,7 +258,7 @@ function App() {
     [createThumbnail],
   )
 
-  const deleteImage = React.useCallback(
+  const deleteImage = window.React.useCallback(
     (id) => {
       setSavedImages((prev) => {
         const updated = prev.filter((img) => img.id !== id)
@@ -286,7 +284,7 @@ function App() {
   )
 
   // Canvas and circle spotlight logic with enhanced error handling
-  React.useEffect(() => {
+  window.React.useEffect(() => {
     const canvas = canvasRef.current
     if (!canvas) return
 
@@ -745,7 +743,7 @@ function App() {
     // Animation loop for smooth rendering
     function animate() {
       drawScene()
-      animationFrameRef.current = requestAnimationFrame(animate)
+      animationFrameRef.current = window.requestAnimationFrame(animate)
     }
 
     // Setup event listeners
@@ -771,7 +769,7 @@ function App() {
       window.removeEventListener("resize", resizeCanvas)
 
       if (animationFrameRef.current) {
-        cancelAnimationFrame(animationFrameRef.current)
+        window.cancelAnimationFrame(animationFrameRef.current)
       }
       if (clickTimeout) clearTimeout(clickTimeout)
       if (inactivityTimerRef.current) clearTimeout(inactivityTimerRef.current)
@@ -784,7 +782,7 @@ function App() {
   const ImageGallery = () => {
     if (!showImageGallery) return null
 
-    return React.createElement(
+    return window.React.createElement(
       "div",
       {
         className: "dialog-overlay",
@@ -793,14 +791,18 @@ function App() {
         "aria-modal": "true",
         "aria-labelledby": "gallery-title",
       },
-      React.createElement(
+      window.React.createElement(
         "div",
         { className: "dialog-content", onClick: (e) => e.stopPropagation() },
-        React.createElement(
+        window.React.createElement(
           "div",
           { className: "flex justify-between items-center mb-4" },
-          React.createElement("h2", { id: "gallery-title", className: "text-xl font-semibold" }, "Image Gallery"),
-          React.createElement(
+          window.React.createElement(
+            "h2",
+            { id: "gallery-title", className: "text-xl font-semibold" },
+            "Image Gallery",
+          ),
+          window.React.createElement(
             "button",
             {
               onClick: () => setShowImageGallery(false),
@@ -810,19 +812,19 @@ function App() {
             "×",
           ),
         ),
-        React.createElement(
+        window.React.createElement(
           "p",
           { className: "text-gray-400 mb-4" },
           "Select an image to use or manage your saved images",
         ),
-        React.createElement(
+        window.React.createElement(
           "div",
           { className: "h-96 overflow-y-auto p-4" },
-          React.createElement(
+          window.React.createElement(
             "div",
             { className: "grid grid-cols-3 gap-4" },
             // Default image
-            React.createElement(
+            window.React.createElement(
               "div",
               {
                 className: `relative cursor-pointer rounded-lg overflow-hidden border-2 transition-all ${
@@ -840,13 +842,13 @@ function App() {
                 tabIndex: 0,
                 "aria-label": "Select default mountain image",
               },
-              React.createElement("img", {
+              window.React.createElement("img", {
                 src: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80",
                 alt: "Default mountain landscape",
                 className: "w-full h-24 object-cover",
                 loading: "lazy",
               }),
-              React.createElement(
+              window.React.createElement(
                 "div",
                 {
                   className: "absolute bottom-0 left-0 right-0 bg-black/70 text-white text-sm p-2",
@@ -856,7 +858,7 @@ function App() {
             ),
             // Saved images
             ...savedImages.map((image) =>
-              React.createElement(
+              window.React.createElement(
                 "div",
                 {
                   key: image.id,
@@ -873,20 +875,20 @@ function App() {
                   tabIndex: 0,
                   "aria-label": `Select ${image.name}`,
                 },
-                React.createElement("img", {
+                window.React.createElement("img", {
                   src: image.thumbnail,
                   alt: image.name,
                   className: "w-full h-24 object-cover",
                   loading: "lazy",
                 }),
-                React.createElement(
+                window.React.createElement(
                   "div",
                   {
                     className: "absolute bottom-0 left-0 right-0 bg-black/70 text-white text-sm p-2",
                   },
                   image.name,
                 ),
-                React.createElement(
+                window.React.createElement(
                   "button",
                   {
                     className:
@@ -903,7 +905,7 @@ function App() {
             ),
           ),
           savedImages.length === 0 &&
-            React.createElement(
+            window.React.createElement(
               "div",
               { className: "text-center text-gray-500 py-8" },
               "No saved images. Upload some images to get started!",
@@ -917,25 +919,25 @@ function App() {
   const Instructions = () => {
     if (!showInstructions || !showUI) return null
 
-    return React.createElement(
+    return window.React.createElement(
       "div",
       { className: "absolute top-4 left-4 z-20 max-w-sm transition-opacity duration-500" },
-      React.createElement(
+      window.React.createElement(
         "div",
         { className: "card", role: "region", "aria-labelledby": "instructions-title" },
-        React.createElement(
+        window.React.createElement(
           "div",
           { className: "flex justify-between items-center mb-2" },
-          React.createElement(
+          window.React.createElement(
             "h2",
             {
               id: "instructions-title",
               className: "text-xl flex items-center gap-2",
             },
-            React.createElement("span", { "aria-hidden": "true" }, "ℹ️"),
+            window.React.createElement("span", { "aria-hidden": "true" }, "ℹ️"),
             "Circle Spotlight",
           ),
-          React.createElement(
+          window.React.createElement(
             "button",
             {
               onClick: () => setShowInstructions(false),
@@ -945,25 +947,25 @@ function App() {
             "×",
           ),
         ),
-        React.createElement(
+        window.React.createElement(
           "p",
           { className: "text-gray-400 mb-4" },
           "Create animated color spotlights in grayscale images",
         ),
-        React.createElement(
+        window.React.createElement(
           "div",
           { className: "flex flex-col gap-4 text-sm" },
-          React.createElement(
+          window.React.createElement(
             "div",
             {
               className: "p-2 rounded bg-gray-800/50 border border-gray-700",
             },
-            React.createElement(
+            window.React.createElement(
               "h4",
               { className: "font-medium text-teal-400 mb-2" },
               isMobile ? "Mobile Instructions:" : "Desktop Instructions:",
             ),
-            React.createElement(
+            window.React.createElement(
               "p",
               null,
               isMobile
@@ -971,26 +973,26 @@ function App() {
                 : "Click 3 different points quickly to create an animated spotlight circle",
             ),
           ),
-          React.createElement(
+          window.React.createElement(
             "div",
             {
               className: "p-2 rounded bg-blue-800/30 border border-blue-700",
             },
-            React.createElement("h4", { className: "font-medium text-blue-400 mb-2" }, "Image Management:"),
-            React.createElement("p", null, "Upload your own images and save them locally for future use"),
+            window.React.createElement("h4", { className: "font-medium text-blue-400 mb-2" }, "Image Management:"),
+            window.React.createElement("p", null, "Upload your own images and save them locally for future use"),
           ),
-          React.createElement(
+          window.React.createElement(
             "p",
             { className: "text-gray-300" },
             "Once created, drag to smoothly move the spotlight around the image",
           ),
-          React.createElement(
+          window.React.createElement(
             "p",
             { className: "text-yellow-300" },
             "Circle will disappear after 10 seconds of inactivity",
           ),
           isCircleActive &&
-            React.createElement(
+            window.React.createElement(
               "div",
               { className: "text-teal-400 font-medium", "aria-live": "polite" },
               "✓ Circle active! Try moving it around.",
@@ -1004,30 +1006,30 @@ function App() {
   const LoadingOverlay = () => {
     if (!isImageLoading) return null
 
-    return React.createElement(
+    return window.React.createElement(
       "div",
       {
         className: "fixed inset-0 bg-black/50 flex items-center justify-center z-50",
         role: "status",
         "aria-label": "Loading image",
       },
-      React.createElement(
+      window.React.createElement(
         "div",
         { className: "bg-black/80 p-6 rounded-lg flex items-center gap-4" },
-        React.createElement("div", { className: "image-loading" }),
-        React.createElement("span", { className: "text-white" }, "Loading image..."),
+        window.React.createElement("div", { className: "image-loading" }),
+        window.React.createElement("span", { className: "text-white" }, "Loading image..."),
       ),
     )
   }
 
-  return React.createElement(
+  return window.React.createElement(
     "div",
     { className: "relative w-full h-screen bg-black overflow-hidden" },
     // Background container
-    React.createElement(
+    window.React.createElement(
       "div",
       { className: "absolute inset-0 z-0" },
-      React.createElement("img", {
+      window.React.createElement("img", {
         src: currentImageUrl,
         alt: "Background image for spotlight effect",
         className: "w-full h-full object-cover filter grayscale opacity-50",
@@ -1035,21 +1037,21 @@ function App() {
       }),
     ),
     // Canvas for interactive elements
-    React.createElement("canvas", {
+    window.React.createElement("canvas", {
       ref: canvasRef,
       className: "absolute inset-0 z-10 cursor-crosshair",
       role: "application",
       "aria-label": "Interactive spotlight canvas",
     }),
     // Control buttons - only show when UI is visible
-    React.createElement(
+    window.React.createElement(
       "div",
       {
         className: `absolute top-4 right-4 z-20 flex gap-2 transition-opacity duration-500 ${
           showUI ? "opacity-100" : "opacity-0 pointer-events-none"
         }`,
       },
-      React.createElement("input", {
+      window.React.createElement("input", {
         ref: fileInputRef,
         type: "file",
         accept: "image/*",
@@ -1057,7 +1059,7 @@ function App() {
         className: "hidden",
         "aria-label": "Upload image file",
       }),
-      React.createElement(
+      window.React.createElement(
         "button",
         {
           onClick: () => fileInputRef.current?.click(),
@@ -1065,30 +1067,30 @@ function App() {
           disabled: isImageLoading,
           "aria-label": "Upload new image",
         },
-        React.createElement("span", { "aria-hidden": "true", className: "mr-2" }, "📤"),
+        window.React.createElement("span", { "aria-hidden": "true", className: "mr-2" }, "📤"),
         "Upload Image",
       ),
-      React.createElement(
+      window.React.createElement(
         "button",
         {
           onClick: () => setShowImageGallery(true),
           className: "bg-blue-600 hover:bg-blue-700 text-white transition-colors",
           "aria-label": `Open image gallery with ${savedImages.length} saved images`,
         },
-        React.createElement("span", { "aria-hidden": "true", className: "mr-2" }, "🖼️"),
+        window.React.createElement("span", { "aria-hidden": "true", className: "mr-2" }, "🖼️"),
         `Gallery (${savedImages.length})`,
       ),
     ),
     // Instructions
-    React.createElement(Instructions),
+    window.React.createElement(Instructions),
     // Image Gallery Dialog
-    React.createElement(ImageGallery),
+    window.React.createElement(ImageGallery),
     // Loading overlay
-    React.createElement(LoadingOverlay),
+    window.React.createElement(LoadingOverlay),
     // Toggle instructions button when hidden
     !showInstructions &&
       showUI &&
-      React.createElement(
+      window.React.createElement(
         "button",
         {
           className:
@@ -1096,12 +1098,12 @@ function App() {
           onClick: () => setShowInstructions(true),
           "aria-label": "Show instructions",
         },
-        React.createElement("span", { "aria-hidden": "true", className: "mr-2" }, "ℹ️"),
+        window.React.createElement("span", { "aria-hidden": "true", className: "mr-2" }, "ℹ️"),
         "Show Instructions",
       ),
     // Show a small hint button when UI is hidden
     !showUI &&
-      React.createElement(
+      window.React.createElement(
         "button",
         {
           className:
@@ -1109,24 +1111,28 @@ function App() {
           onClick: () => setShowUI(true),
           "aria-label": "Show user interface",
         },
-        React.createElement("span", { "aria-hidden": "true" }, "ℹ️"),
+        window.React.createElement("span", { "aria-hidden": "true" }, "ℹ️"),
       ),
     // Error display
     imageLoadError &&
-      React.createElement("div", { className: "error-message absolute top-20 left-4 right-4 z-50" }, imageLoadError),
+      window.React.createElement(
+        "div",
+        { className: "error-message absolute top-20 left-4 right-4 z-50" },
+        imageLoadError,
+      ),
   )
 }
 
-// Mount the app using React 18 createRoot
+// Mount the app using React 18 createRoot or fallback to React 17 render
 window.addEventListener("DOMContentLoaded", () => {
   const root = document.getElementById("root")
   if (root && window.ReactDOM && window.ReactDOM.createRoot) {
     // Use React 18 createRoot
     const reactRoot = window.ReactDOM.createRoot(root)
-    reactRoot.render(React.createElement(App))
+    reactRoot.render(window.React.createElement(App))
   } else if (root && window.ReactDOM) {
     // Fallback to React 17 render
-    window.ReactDOM.render(React.createElement(App), root)
+    window.ReactDOM.render(window.React.createElement(App), root)
   } else {
     console.error("Failed to mount React app: ReactDOM not available")
   }
