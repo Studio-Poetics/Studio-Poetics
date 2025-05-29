@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Three Touch Circle Spotlight</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background: #000;
+            font-family: Arial, sans-serif;
+            touch-action: none;
+            user-select: none;
+        }
+        
+        #background-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+        
+        #background-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: grayscale(100%);
+            opacity: 0.5;
+        }
+        
+        #color-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 1;
+        }
+        
+        #canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            display: block;
+            cursor: crosshair;
+            z-index: 10;
+        }
+        
+        .instructions {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: white;
+            background: rgba(0,0,0,0.8);
+            padding: 15px;
+            border-radius: 10px;
+            max-width: 300px;
+            z-index: 100;
+            border: 1px solid #666;
+        }
+        
+        .touch-point {
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            background: rgba(255, 255, 255, 0.9);
+            border: 2px solid #fff;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: 50;
+            box-shadow: 0 0 10px rgba(255,255,255,0.5);
+        }
+    </style>
+</head>
+<body>
+    <div id="background-container">
+        <img id="background-image" src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80" alt="Background">
+    </div>
+    
+    <div class="instructions">
+        <h3>Circle Spotlight</h3>
+        <p><strong>Mobile:</strong> Touch with 3 fingers</p>
+        <p><strong>Desktop:</strong> Click 3 points quickly</p>
+        <p>Drag to move the color spotlight</p>
+    </div>
+    
+    <canvas id="canvas"></canvas>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const backgroundImg = document.getElementById('background-image');
+        
+        // Touch/click tracking - declare variables first
+        let touches = [];
+        let mouseClicks = [];
+        let circle = null;
+        let isDragging = false;
+        let dragOffset = { x: 0, y: 0 };
+        let imageLoaded = false;
+        
+        let colorImage = new Image();
+        colorImage.crossOrigin = "anonymous";
+        colorImage.src = "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80";
+        
+        // Set canvas size
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            drawScene();
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+        
+        // Visual touch indicators
+        const touchIndicators = [];
+        
+        function createTouchIndicator(x, y) {
+            const indicator = document.createElement('div');
+            indicator.className = 'touch-point';
+            indicator.style.left = x + 'px';
+            indicator.style.top = y + 'px';
+            document.body.appendChild(indicator);
+            return indicator;
+        }
+        
+        function clearTouchIndicators() {
+            touchIndicators.forEach(indicator => indicator.remove());
+            touchIndicators.length = 0;
+        }
+        
+        // Calculate circle from three points
+        function calculateCircle(p1, p2, p3) {
+            const ax = p1.x, ay = p1.y;
+            const bx = p2.x, by = p2.y;
+            const cx = p3.x, cy = p3.y;
+            
+            const d = 2 * (ax * (by - cy) + bx * (cy - ay) + cx * (ay - by));
+            if (Math.abs(d) < 0.001) return null; // Points are collinear
+            
+            const ux = ((ax * ax + ay * ay) * (by - cy) + (bx * bx + by * by) * (cy - ay) + (cx * cx + cy * cy) * (ay - by)) / d;
+            const uy = ((ax * ax + ay * ay) * (cx - bx) + (bx * bx + by * by) * (ax - cx) + (cx * cx + cy * cy) * (bx - ax)) / d;
+            
+            const radius = Math.sqrt((ax - ux) * (ax - ux) + (ay - uy) * (ay - uy));
+            
+            return { x: ux, y: uy, radius: radius };
+        }
+        
+        function drawScene() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            if (circle && colorImage.complete && imageLoaded) {
+                // Create a circular mask for the color image
+                ctx.save();
+                
+                // Draw color image clipped to circle
+                ctx.beginPath();
+                ctx.arc(circle.x, circle.y, circle.radius, 0, 2 * Math.PI);
+                ctx.clip();
+                
+                // Calculate image scaling to cover canvas
+                const imgAspect = colorImage.naturalWidth / colorImage.naturalHeight;
+                const canvasAspect = canvas.width / canvas.height;
+                
+                let drawWidth, drawHeight, drawX, drawY;
+                
+                if (imgAspect > canvasAspect) {
+                    drawHeight = canvas.height;
+                    drawWidth = drawHeight * imgAspect;
+                    drawX = (canvas.width - drawWidth) / 2;
+                    drawY = 0;
+                } else {
+                    drawWidth = canvas.width;
+                    drawHeight = drawWidth / imgAspect;
+                    drawX = 0;
+                    drawY = (canvas.height - drawHeight) / 2;
+                }
+                
+                ctx.drawImage(colorImage, drawX, drawY, drawWidth, drawHeight);
+                ctx.restore();
+                
+                // Draw circle border
+                ctx.beginPath();
+                ctx.arc(circle.x, circle.y, circle.radius, 0, 2 * Math.PI);
+                ctx.strokeStyle = '#fff';
+                ctx.lineWidth = 3;
+                ctx.stroke();
+                
+                // Add subtle outer glow
+                ctx.beginPath();
+                ctx.arc(circle.x, circle.y, circle.radius + 5, 0, 2 * Math.PI);
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+                ctx.lineWidth = 1;
+                ctx.stroke();
+                
+                // Draw center point
+                ctx.beginPath();
+                ctx.arc(circle.x, circle.y, 3, 0, 2 * Math.PI);
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+                ctx.fill();
+            }
+        }
+        
+        function getCentroid(points) {
+            const x = points.reduce((sum, p) => sum + p.x, 0) / points.length;
+            const y = points.reduce((sum, p) => sum + p.y, 0) / points.length;
+            return { x, y };
+        }
+        
+        // Touch events for mobile
+        canvas.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            touches = Array.from(e.touches).map(touch => ({
+                id: touch.identifier,
+                x: touch.clientX,
+                y: touch.clientY
+            }));
+            
+            clearTouchIndicators();
+            touches.forEach(touch => {
+                const indicator = createTouchIndicator(touch.x, touch.y);
+                touchIndicators.push(indicator);
+            });
+            
+            if (touches.length === 3) {
+                circle = calculateCircle(touches[0], touches[1], touches[2]);
+                if (circle) {
+                    const centroid = getCentroid(touches);
+                    dragOffset.x = centroid.x - circle.x;
+                    dragOffset.y = centroid.y - circle.y;
+                    isDragging = true;
+                }
+                drawScene();
+            }
+        });
+        
+        canvas.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+            if (isDragging && touches.length === 3) {
+                const newTouches = Array.from(e.touches).map(touch => ({
+                    id: touch.identifier,
+                    x: touch.clientX,
+                    y: touch.clientY
+                }));
+                
+                // Update touch indicators
+                newTouches.forEach((touch, i) => {
+                    if (touchIndicators[i]) {
+                        touchIndicators[i].style.left = touch.x + 'px';
+                        touchIndicators[i].style.top = touch.y + 'px';
+                    }
+                });
+                
+                const centroid = getCentroid(newTouches);
+                circle.x = centroid.x - dragOffset.x;
+                circle.y = centroid.y - dragOffset.y;
+                
+                drawScene();
+            }
+        });
+        
+        canvas.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            if (e.touches.length < 3) {
+                isDragging = false;
+                clearTouchIndicators();
+            }
+        });
+        
+        // Mouse events for desktop
+        let clickTimeout = null;
+        
+        canvas.addEventListener('mousedown', (e) => {
+            const point = { x: e.clientX, y: e.clientY };
+            mouseClicks.push(point);
+            
+            const indicator = createTouchIndicator(point.x, point.y);
+            touchIndicators.push(indicator);
+            
+            // Clear old clicks after 2 seconds
+            if (clickTimeout) clearTimeout(clickTimeout);
+            clickTimeout = setTimeout(() => {
+                mouseClicks = [];
+                clearTouchIndicators();
+            }, 2000);
+            
+            if (mouseClicks.length === 3) {
+                circle = calculateCircle(mouseClicks[0], mouseClicks[1], mouseClicks[2]);
+                if (circle) {
+                    const centroid = getCentroid(mouseClicks);
+                    dragOffset.x = centroid.x - circle.x;
+                    dragOffset.y = centroid.y - circle.y;
+                }
+                drawScene();
+                
+                // Reset for next set of clicks
+                setTimeout(() => {
+                    mouseClicks = [];
+                    clearTouchIndicators();
+                }, 500);
+            }
+        });
+        
+        canvas.addEventListener('mousemove', (e) => {
+            if (circle && mouseClicks.length === 3) {
+                const mousePos = { x: e.clientX, y: e.clientY };
+                circle.x = mousePos.x - dragOffset.x;
+                circle.y = mousePos.y - dragOffset.y;
+                drawScene();
+            }
+        });
+        
+        // Redraw when image loads
+        colorImage.onload = () => {
+            imageLoaded = true;
+            drawScene();
+        };
+        
+        // Initial setup
+        if (colorImage.complete) {
+            imageLoaded = true;
+        }
+        
+        // Initial draw
+        drawScene();
+    </script>
+</body>
+</html>
