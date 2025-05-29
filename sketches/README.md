@@ -31,17 +31,6 @@ An interactive web application that creates a color spotlight effect on grayscal
 - Click "Gallery" to view and manage saved images
 - Images are saved locally in your browser's storage
 
-## Hosting on GitHub Pages
-
-This project is ready to be hosted on GitHub Pages. Follow these steps to deploy:
-
-1. Create a new repository on GitHub
-2. Upload all the files from this project to your repository
-3. Go to your repository settings
-4. Scroll down to the "GitHub Pages" section
-5. Select the branch you want to deploy (usually `main` or `master`)
-6. Click "Save"
-7. Your site will be published at `https://[your-username].github.io/[repository-name]/`
 
 ## Development
 
