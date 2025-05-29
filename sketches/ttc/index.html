@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Circle Spotlight Interactive</title>
+  <meta name="description" content="Create a color spotlight in a grayscale image with touch or mouse interactions">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div id="root" class="relative w-full h-screen bg-black overflow-hidden">
+    <!-- App will be mounted here -->
+    <div class="flex items-center justify-center h-screen">
+      <div class="text-white text-center">
+        <div class="loading-spinner mb-4"></div>
+        <p>Loading Circle Spotlight...</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts - Using React 18 for better hooks support -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
