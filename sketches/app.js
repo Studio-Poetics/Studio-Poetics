@@ -5,26 +5,6 @@
 import React from "react"
 import ReactDOM from "react-dom"
 
-// SavedImage interface
-// interface SavedImage {
-//   id: string
-//   name: string
-//   url: string
-//   thumbnail: string
-// }
-
-// Circle interface
-// interface Circle {
-//   x: number
-//   y: number
-//   radius: number
-//   targetX?: number
-//   targetY?: number
-//   targetRadius?: number
-//   scale?: number
-//   opacity?: number
-// }
-
 // Main App Component
 function App() {
   const canvasRef = React.useRef(null)
