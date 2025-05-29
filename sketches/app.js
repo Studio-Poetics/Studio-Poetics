@@ -1,9 +1,10 @@
 "use client"
 
-// Circle Spotlight App
+// Circle Spotlight App - Fixed for CDN React
 
+// Import necessary modules
 import React from "react"
-import ReactDOM from "react-dom"
+import ReactDOM from "react-dom/client"
 
 // Main App Component
 function App() {
@@ -615,45 +616,63 @@ function App() {
   const ImageGallery = () => {
     if (!showImageGallery) return null
 
-    return (
-      <div className="dialog-overlay" onClick={() => setShowImageGallery(false)}>
-        <div className="dialog-content" onClick={(e) => e.stopPropagation()}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
-            <h2>Image Gallery</h2>
-            <button
-              onClick={() => setShowImageGallery(false)}
-              style={{ background: "none", border: "none", fontSize: "1.5rem", cursor: "pointer", color: "#999" }}
-            >
-              ×
-            </button>
-          </div>
-          <p style={{ color: "#999", marginBottom: "1rem" }}>Select an image to use or manage your saved images</p>
-
-          <div style={{ height: "400px", overflowY: "auto", padding: "1rem" }}>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "1rem" }}>
-              {/* Default image */}
-              <div
-                style={{
+    return React.createElement(
+      "div",
+      { className: "dialog-overlay", onClick: () => setShowImageGallery(false) },
+      React.createElement(
+        "div",
+        { className: "dialog-content", onClick: (e) => e.stopPropagation() },
+        React.createElement(
+          "div",
+          { style: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" } },
+          React.createElement("h2", null, "Image Gallery"),
+          React.createElement(
+            "button",
+            {
+              onClick: () => setShowImageGallery(false),
+              style: { background: "none", border: "none", fontSize: "1.5rem", cursor: "pointer", color: "#999" },
+            },
+            "×",
+          ),
+        ),
+        React.createElement(
+          "p",
+          { style: { color: "#999", marginBottom: "1rem" } },
+          "Select an image to use or manage your saved images",
+        ),
+        React.createElement(
+          "div",
+          { style: { height: "400px", overflowY: "auto", padding: "1rem" } },
+          React.createElement(
+            "div",
+            { style: { display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "1rem" } },
+            // Default image
+            React.createElement(
+              "div",
+              {
+                style: {
                   position: "relative",
                   cursor: "pointer",
                   borderRadius: "0.5rem",
                   overflow: "hidden",
                   border: currentImageUrl.includes("unsplash") ? "2px solid rgb(20, 184, 166)" : "2px solid #333",
-                }}
-                onClick={() => {
+                },
+                onClick: () => {
                   setCurrentImageUrl(
                     "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
                   )
                   setShowImageGallery(false)
-                }}
-              >
-                <img
-                  src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80"
-                  alt="Default mountain"
-                  style={{ width: "100%", height: "100px", objectFit: "cover" }}
-                />
-                <div
-                  style={{
+                },
+              },
+              React.createElement("img", {
+                src: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80",
+                alt: "Default mountain",
+                style: { width: "100%", height: "100px", objectFit: "cover" },
+              }),
+              React.createElement(
+                "div",
+                {
+                  style: {
                     position: "absolute",
                     bottom: 0,
                     left: 0,
@@ -665,35 +684,38 @@ function App() {
                     whiteSpace: "nowrap",
                     overflow: "hidden",
                     textOverflow: "ellipsis",
-                  }}
-                >
-                  Default Mountain
-                </div>
-              </div>
-
-              {/* Saved images */}
-              {savedImages.map((image) => (
-                <div
-                  key={image.id}
-                  style={{
+                  },
+                },
+                "Default Mountain",
+              ),
+            ),
+            // Saved images
+            ...savedImages.map((image) =>
+              React.createElement(
+                "div",
+                {
+                  key: image.id,
+                  style: {
                     position: "relative",
                     cursor: "pointer",
                     borderRadius: "0.5rem",
                     overflow: "hidden",
                     border: currentImageUrl === image.url ? "2px solid rgb(20, 184, 166)" : "2px solid #333",
-                  }}
-                  onClick={() => {
+                  },
+                  onClick: () => {
                     setCurrentImageUrl(image.url)
                     setShowImageGallery(false)
-                  }}
-                >
-                  <img
-                    src={image.thumbnail || "/placeholder.svg"}
-                    alt={image.name}
-                    style={{ width: "100%", height: "100px", objectFit: "cover" }}
-                  />
-                  <div
-                    style={{
+                  },
+                },
+                React.createElement("img", {
+                  src: image.thumbnail || "/placeholder.svg",
+                  alt: image.name,
+                  style: { width: "100%", height: "100px", objectFit: "cover" },
+                }),
+                React.createElement(
+                  "div",
+                  {
+                    style: {
                       position: "absolute",
                       bottom: 0,
                       left: 0,
@@ -705,12 +727,14 @@ function App() {
                       whiteSpace: "nowrap",
                       overflow: "hidden",
                       textOverflow: "ellipsis",
-                    }}
-                  >
-                    {image.name}
-                  </div>
-                  <button
-                    style={{
+                    },
+                  },
+                  image.name,
+                ),
+                React.createElement(
+                  "button",
+                  {
+                    style: {
                       position: "absolute",
                       top: "0.25rem",
                       right: "0.25rem",
@@ -725,25 +749,25 @@ function App() {
                       fontSize: "0.75rem",
                       border: "none",
                       cursor: "pointer",
-                    }}
-                    onClick={(e) => {
+                    },
+                    onClick: (e) => {
                       e.stopPropagation()
                       deleteImage(image.id)
-                    }}
-                  >
-                    ×
-                  </button>
-                </div>
-              ))}
-            </div>
-            {savedImages.length === 0 && (
-              <div style={{ textAlign: "center", color: "#666", padding: "2rem 0" }}>
-                No saved images. Upload some images to get started!
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
+                    },
+                  },
+                  "×",
+                ),
+              ),
+            ),
+          ),
+          savedImages.length === 0 &&
+            React.createElement(
+              "div",
+              { style: { textAlign: "center", color: "#666", padding: "2rem 0" } },
+              "No saved images. Upload some images to get started!",
+            ),
+        ),
+      ),
     )
   }
 
@@ -751,19 +775,26 @@ function App() {
   const Instructions = () => {
     if (!showInstructions || !showUI) return null
 
-    return (
-      <div className="absolute top-4 left-4 z-20 max-w-sm transition-opacity duration-500">
-        <div className="card">
-          <div
-            style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.5rem" }}
-          >
-            <h2 style={{ display: "flex", alignItems: "center", gap: "0.5rem", fontSize: "1.25rem" }}>
-              <span style={{ color: "rgb(20, 184, 166)" }}>ℹ️</span>
-              Circle Spotlight
-            </h2>
-            <button
-              onClick={() => setShowInstructions(false)}
-              style={{
+    return React.createElement(
+      "div",
+      { className: "absolute top-4 left-4 z-20 max-w-sm transition-opacity duration-500" },
+      React.createElement(
+        "div",
+        { className: "card" },
+        React.createElement(
+          "div",
+          { style: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.5rem" } },
+          React.createElement(
+            "h2",
+            { style: { display: "flex", alignItems: "center", gap: "0.5rem", fontSize: "1.25rem" } },
+            React.createElement("span", { style: { color: "rgb(20, 184, 166)" } }, "ℹ️"),
+            "Circle Spotlight",
+          ),
+          React.createElement(
+            "button",
+            {
+              onClick: () => setShowInstructions(false),
+              style: {
                 background: "none",
                 border: "none",
                 borderRadius: "50%",
@@ -774,112 +805,149 @@ function App() {
                 justifyContent: "center",
                 color: "#999",
                 cursor: "pointer",
-              }}
-            >
-              ×
-            </button>
-          </div>
-          <p style={{ color: "#999", marginBottom: "0.75rem" }}>Create animated color spotlights in grayscale images</p>
-          <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem", fontSize: "0.875rem" }}>
-            <div
-              style={{
+              },
+            },
+            "×",
+          ),
+        ),
+        React.createElement(
+          "p",
+          { style: { color: "#999", marginBottom: "0.75rem" } },
+          "Create animated color spotlights in grayscale images",
+        ),
+        React.createElement(
+          "div",
+          { style: { display: "flex", flexDirection: "column", gap: "0.75rem", fontSize: "0.875rem" } },
+          React.createElement(
+            "div",
+            {
+              style: {
                 padding: "0.5rem",
                 background: "rgba(50, 50, 50, 0.5)",
                 borderRadius: "0.375rem",
                 border: "1px solid #444",
-              }}
-            >
-              <h4 style={{ color: "rgb(20, 184, 166)", marginBottom: "0.25rem", fontWeight: 500 }}>
-                {isMobile ? "Mobile Instructions:" : "Desktop Instructions:"}
-              </h4>
-              {isMobile ? (
-                <p>Touch with 3 fingers to create an animated spotlight circle</p>
-              ) : (
-                <p>Click 3 different points quickly to create an animated spotlight circle</p>
-              )}
-            </div>
-            <div
-              style={{
+              },
+            },
+            React.createElement(
+              "h4",
+              { style: { color: "rgb(20, 184, 166)", marginBottom: "0.25rem", fontWeight: 500 } },
+              isMobile ? "Mobile Instructions:" : "Desktop Instructions:",
+            ),
+            React.createElement(
+              "p",
+              null,
+              isMobile
+                ? "Touch with 3 fingers to create an animated spotlight circle"
+                : "Click 3 different points quickly to create an animated spotlight circle",
+            ),
+          ),
+          React.createElement(
+            "div",
+            {
+              style: {
                 padding: "0.5rem",
                 background: "rgba(30, 58, 138, 0.3)",
                 borderRadius: "0.375rem",
                 border: "1px solid #2563eb",
-              }}
-            >
-              <h4 style={{ color: "rgb(96, 165, 250)", marginBottom: "0.25rem", fontWeight: 500 }}>
-                Image Management:
-              </h4>
-              <p>Upload your own images and save them locally for future use</p>
-            </div>
-            <p style={{ color: "#ccc" }}>Once created, drag to smoothly move the spotlight around the image</p>
-            <p style={{ color: "rgb(251, 191, 36)" }}>Circle will disappear after 10 seconds of inactivity</p>
-            {isCircleActive && (
-              <div style={{ color: "rgb(20, 184, 166)", fontWeight: 500, animation: "pulse 1.5s infinite" }}>
-                ✓ Circle active! Try moving it around.
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
+              },
+            },
+            React.createElement(
+              "h4",
+              { style: { color: "rgb(96, 165, 250)", marginBottom: "0.25rem", fontWeight: 500 } },
+              "Image Management:",
+            ),
+            React.createElement("p", null, "Upload your own images and save them locally for future use"),
+          ),
+          React.createElement(
+            "p",
+            { style: { color: "#ccc" } },
+            "Once created, drag to smoothly move the spotlight around the image",
+          ),
+          React.createElement(
+            "p",
+            { style: { color: "rgb(251, 191, 36)" } },
+            "Circle will disappear after 10 seconds of inactivity",
+          ),
+          isCircleActive &&
+            React.createElement(
+              "div",
+              { style: { color: "rgb(20, 184, 166)", fontWeight: 500, animation: "pulse 1.5s infinite" } },
+              "✓ Circle active! Try moving it around.",
+            ),
+        ),
+      ),
     )
   }
 
-  return (
-    <div className="relative w-full h-screen bg-black overflow-hidden">
-      {/* Background container */}
-      <div className="absolute inset-0 z-0">
-        <img
-          src={currentImageUrl || "/placeholder.svg"}
-          alt="Background"
-          className="w-full h-full object-cover filter grayscale opacity-50"
-        />
-      </div>
-
-      {/* Canvas for interactive elements */}
-      <canvas ref={canvasRef} className="absolute inset-0 z-10 cursor-crosshair" />
-
-      {/* Control buttons - only show when UI is visible */}
-      <div
-        className={`absolute top-4 right-4 z-20 flex gap-2 transition-opacity duration-500 ${
+  return React.createElement(
+    "div",
+    { className: "relative w-full h-screen bg-black overflow-hidden" },
+    // Background container
+    React.createElement(
+      "div",
+      { className: "absolute inset-0 z-0" },
+      React.createElement("img", {
+        src: currentImageUrl || "/placeholder.svg",
+        alt: "Background",
+        className: "w-full h-full object-cover filter grayscale opacity-50",
+      }),
+    ),
+    // Canvas for interactive elements
+    React.createElement("canvas", { ref: canvasRef, className: "absolute inset-0 z-10 cursor-crosshair" }),
+    // Control buttons - only show when UI is visible
+    React.createElement(
+      "div",
+      {
+        className: `absolute top-4 right-4 z-20 flex gap-2 transition-opacity duration-500 ${
           showUI ? "opacity-100" : "opacity-0 pointer-events-none"
-        }`}
-      >
-        <input ref={fileInputRef} type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
-
-        <button onClick={() => fileInputRef.current?.click()} className="bg-teal-600">
-          <span style={{ marginRight: "0.5rem" }}>📤</span>
-          Upload Image
-        </button>
-
-        <button onClick={() => setShowImageGallery(true)} className="bg-blue-600">
-          <span style={{ marginRight: "0.5rem" }}>🖼️</span>
-          Gallery ({savedImages.length})
-        </button>
-      </div>
-
-      {/* Instructions */}
-      <Instructions />
-
-      {/* Image Gallery Dialog */}
-      <ImageGallery />
-
-      {/* Toggle instructions button when hidden - only show when UI is visible and instructions are disabled */}
-      {!showInstructions && showUI && (
-        <button
-          className="absolute top-4 left-4 z-20 bg-black/70 hover:bg-black/90 text-white transition-opacity duration-500"
-          onClick={() => setShowInstructions(true)}
-        >
-          <span style={{ marginRight: "0.5rem" }}>ℹ️</span>
-          Show Instructions
-        </button>
-      )}
-
-      {/* Show a small hint button when UI is hidden */}
-      {!showUI && (
-        <button
-          className="absolute bottom-4 right-4 z-20 bg-black/30 hover:bg-black/60 text-white h-10 w-10 rounded-full p-0 transition-opacity duration-300 opacity-30 hover:opacity-100"
-          onClick={() => setShowUI(true)}
-          style={{
+        }`,
+      },
+      React.createElement("input", {
+        ref: fileInputRef,
+        type: "file",
+        accept: "image/*",
+        onChange: handleImageUpload,
+        className: "hidden",
+      }),
+      React.createElement(
+        "button",
+        { onClick: () => fileInputRef.current?.click(), className: "bg-teal-600" },
+        React.createElement("span", { style: { marginRight: "0.5rem" } }, "📤"),
+        "Upload Image",
+      ),
+      React.createElement(
+        "button",
+        { onClick: () => setShowImageGallery(true), className: "bg-blue-600" },
+        React.createElement("span", { style: { marginRight: "0.5rem" } }, "🖼️"),
+        `Gallery (${savedImages.length})`,
+      ),
+    ),
+    // Instructions
+    React.createElement(Instructions),
+    // Image Gallery Dialog
+    React.createElement(ImageGallery),
+    // Toggle instructions button when hidden - only show when UI is visible and instructions are disabled
+    !showInstructions &&
+      showUI &&
+      React.createElement(
+        "button",
+        {
+          className:
+            "absolute top-4 left-4 z-20 bg-black/70 hover:bg-black/90 text-white transition-opacity duration-500",
+          onClick: () => setShowInstructions(true),
+        },
+        React.createElement("span", { style: { marginRight: "0.5rem" } }, "ℹ️"),
+        "Show Instructions",
+      ),
+    // Show a small hint button when UI is hidden
+    !showUI &&
+      React.createElement(
+        "button",
+        {
+          className:
+            "absolute bottom-4 right-4 z-20 bg-black/30 hover:bg-black/60 text-white h-10 w-10 rounded-full p-0 transition-opacity duration-300 opacity-30 hover:opacity-100",
+          onClick: () => setShowUI(true),
+          style: {
             borderRadius: "50%",
             width: "2.5rem",
             height: "2.5rem",
@@ -888,15 +956,13 @@ function App() {
             justifyContent: "center",
             opacity: 0.3,
             transition: "opacity 0.3s",
-          }}
-          onMouseOver={(e) => (e.currentTarget.style.opacity = "1")}
-          onMouseOut={(e) => (e.currentTarget.style.opacity = "0.3")}
-        >
-          ℹ️
-          <span className="sr-only">Show UI</span>
-        </button>
-      )}
-    </div>
+          },
+          onMouseOver: (e) => (e.currentTarget.style.opacity = "1"),
+          onMouseOut: (e) => (e.currentTarget.style.opacity = "0.3"),
+        },
+        "ℹ️",
+        React.createElement("span", { className: "sr-only" }, "Show UI"),
+      ),
   )
 }
 
