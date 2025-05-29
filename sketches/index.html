@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Circle Spotlight Interactive</title>
+  <meta name="description" content="Create a color spotlight in a grayscale image with touch or mouse interactions">
+  <link rel="stylesheet" href="styles.css">
+  <!-- Preload the default image -->
+  <link rel="preload" as="image" href="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80">
+  <!-- Favicon -->
+  <link rel="icon" href="favicon.ico" type="image/x-icon">
+</head>
+<body>
+  <div id="root" class="relative w-full h-screen bg-black overflow-hidden">
+    <!-- App will be mounted here -->
+    <div class="flex items-center justify-center h-screen">
+      <div class="text-white text-center">
+        <div class="loading-spinner mb-4"></div>
+        <p>Loading Circle Spotlight...</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="app.js" type="text/babel" data-type="module"></script>
+</body>
+</html>
