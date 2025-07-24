@@ -282,8 +282,9 @@
                 <p id="deviceInstructionsText">Click 3 different points quickly to create a circle and reveal animations</p>
             </div>
             
-            <p>Drag the circle around to reveal different animated areas</p>
-            <p class="warning-text">Circle will disappear after 10 seconds of inactivity</p>
+            <p>Multiple circles supported! Up to 3 circles can exist simultaneously</p>
+            <p>Drag circles around to reveal different animated areas</p>
+            <p class="warning-text">Circles will disappear after 10 seconds of inactivity</p>
             <div id="statusText"></div>
         </div>
 
@@ -296,20 +297,15 @@
         let canvas, ctx;
         let isMobile = false;
         let showUI = true;
-        let isCircleActive = false;
-        let circle = null;
+        let circles = []; // Array to hold multiple circles
         let touches = [];
         let mouseClicks = [];
         let touchIndicators = [];
-        let isDragging = false;
-        let dragOffset = { x: 0, y: 0 };
-        let inactivityTimer = null;
-        let isAnimating = false;
-        let isDisappearing = false;
-        let animationStartTime = 0;
-        let disappearStartTime = 0;
+        let activeTouchGroups = new Map(); // Track which touches belong to which circle
+        let inactivityTimers = new Map(); // Individual timers for each circle
         const animationDuration = 800;
         const disappearDuration = 1000;
+        const maxCircles = 3; // Maximum number of simultaneous circles
 
         // Initialize game
         function init() {
@@ -344,10 +340,10 @@
             
             if (isMobile) {
                 deviceInstructions.textContent = 'Mobile Instructions:';
-                deviceInstructionsText.textContent = 'Touch with 3 fingers to create a circle and reveal animations';
+                deviceInstructionsText.textContent = 'Touch with 3 fingers to create a circle. Use multiple 3-finger touches for multiple circles!';
             } else {
                 deviceInstructions.textContent = 'Desktop Instructions:';
-                deviceInstructionsText.textContent = 'Click 3 different points quickly to create a circle and reveal animations';
+                deviceInstructionsText.textContent = 'Click 3 different points quickly to create a circle. Repeat for multiple circles!';
             }
         }
 
@@ -423,32 +419,48 @@
         }
 
         function startCircleAnimation(newCircle) {
-            isAnimating = true;
-            animationStartTime = Date.now();
+            newCircle.id = Date.now() + Math.random(); // Unique ID
+            newCircle.isAnimating = true;
+            newCircle.animationStartTime = Date.now();
             newCircle.scale = 0;
             newCircle.opacity = 0;
-            resetInactivityTimer();
+            newCircle.isDisappearing = false;
+            resetInactivityTimer(newCircle.id);
         }
 
-        function resetInactivityTimer() {
-            isDisappearing = false;
-            
-            if (circle) {
+        function resetInactivityTimer(circleId) {
+            if (circles.length > 0) {
                 document.getElementById('instructions').classList.add('hidden');
                 document.getElementById('showUIBtn').classList.add('hidden');
                 showUI = false;
             }
 
-            if (inactivityTimer) {
-                clearTimeout(inactivityTimer);
+            if (inactivityTimers.has(circleId)) {
+                clearTimeout(inactivityTimers.get(circleId));
             }
 
-            inactivityTimer = setTimeout(() => {
+            const timer = setTimeout(() => {
+                const circle = circles.find(c => c.id === circleId);
                 if (circle) {
-                    isDisappearing = true;
-                    disappearStartTime = Date.now();
+                    circle.isDisappearing = true;
+                    circle.disappearStartTime = Date.now();
                 }
             }, 10000);
+            
+            inactivityTimers.set(circleId, timer);
+        }
+        
+        function removeCircle(circleId) {
+            circles = circles.filter(c => c.id !== circleId);
+            if (inactivityTimers.has(circleId)) {
+                clearTimeout(inactivityTimers.get(circleId));
+                inactivityTimers.delete(circleId);
+            }
+            
+            if (circles.length === 0) {
+                showUI = true;
+                document.getElementById('showUIBtn').classList.remove('hidden');
+            }
         }
 
         // Event handlers
@@ -466,55 +478,85 @@
                 touchIndicators.push(indicator);
             });
 
-            if (touches.length === 3) {
+            // Support creating multiple circles with different touch combinations
+            if (touches.length >= 3 && circles.length < maxCircles) {
+                // Try to create a circle with the first 3 touches
                 const newCircle = calculateCircle(touches[0], touches[1], touches[2]);
-                if (newCircle) {
-                    circle = newCircle;
-                    const centroid = getCentroid(touches);
-                    dragOffset.x = centroid.x - circle.x;
-                    dragOffset.y = centroid.y - circle.y;
-                    isDragging = true;
-                    startCircleAnimation(circle);
+                if (newCircle && !circles.some(c => 
+                    Math.abs(c.x - newCircle.x) < 50 && Math.abs(c.y - newCircle.y) < 50
+                )) {
+                    circles.push(newCircle);
+                    const centroid = getCentroid([touches[0], touches[1], touches[2]]);
+                    newCircle.dragOffset = {
+                        x: centroid.x - newCircle.x,
+                        y: centroid.y - newCircle.y
+                    };
+                    newCircle.touchIds = [touches[0].id, touches[1].id, touches[2].id];
+                    startCircleAnimation(newCircle);
                 }
             }
-            resetInactivityTimer();
+            
+            // Reset timers for all circles
+            circles.forEach(circle => resetInactivityTimer(circle.id));
         }
 
         function handleTouchMove(e) {
             e.preventDefault();
-            if (isDragging && touches.length === 3 && circle) {
-                const newTouches = Array.from(e.touches).map(touch => ({
-                    id: touch.identifier,
-                    x: touch.clientX,
-                    y: touch.clientY
-                }));
+            const currentTouches = Array.from(e.touches).map(touch => ({
+                id: touch.identifier,
+                x: touch.clientX,
+                y: touch.clientY
+            }));
 
-                newTouches.forEach((touch, i) => {
-                    if (touchIndicators[i]) {
-                        touchIndicators[i].style.left = touch.x + 'px';
-                        touchIndicators[i].style.top = touch.y + 'px';
+            // Update touch indicators
+            currentTouches.forEach((touch, i) => {
+                if (touchIndicators[i]) {
+                    touchIndicators[i].style.left = touch.x + 'px';
+                    touchIndicators[i].style.top = touch.y + 'px';
+                }
+            });
+
+            // Update circles that are being dragged
+            circles.forEach(circle => {
+                if (circle.touchIds) {
+                    const matchingTouches = currentTouches.filter(touch => 
+                        circle.touchIds.includes(touch.id)
+                    );
+                    
+                    if (matchingTouches.length === 3) {
+                        const centroid = getCentroid(matchingTouches);
+                        if (!circle.targetX) circle.targetX = circle.x;
+                        if (!circle.targetY) circle.targetY = circle.y;
+
+                        circle.targetX = centroid.x - circle.dragOffset.x;
+                        circle.targetY = centroid.y - circle.dragOffset.y;
+                        circle.x += (circle.targetX - circle.x) * 0.15;
+                        circle.y += (circle.targetY - circle.y) * 0.15;
+                        resetInactivityTimer(circle.id);
                     }
-                });
-
-                const centroid = getCentroid(newTouches);
-                if (!circle.targetX) circle.targetX = circle.x;
-                if (!circle.targetY) circle.targetY = circle.y;
-
-                circle.targetX = centroid.x - dragOffset.x;
-                circle.targetY = centroid.y - dragOffset.y;
-                circle.x += (circle.targetX - circle.x) * 0.15;
-                circle.y += (circle.targetY - circle.y) * 0.15;
-                resetInactivityTimer();
-            }
+                }
+            });
         }
 
         function handleTouchEnd(e) {
             e.preventDefault();
-            if (e.touches.length < 3) {
-                isDragging = false;
+            const remainingTouches = Array.from(e.touches).map(touch => touch.identifier);
+            
+            // Clean up circles that no longer have enough touches
+            circles.forEach(circle => {
+                if (circle.touchIds) {
+                    const activeTouches = circle.touchIds.filter(id => remainingTouches.includes(id));
+                    if (activeTouches.length < 3) {
+                        circle.touchIds = null; // Stop dragging this circle
+                    }
+                }
+            });
+            
+            if (e.touches.length === 0) {
                 clearTouchIndicators();
             }
-            resetInactivityTimer();
+            
+            circles.forEach(circle => resetInactivityTimer(circle.id));
         }
 
         function handleMouseDown(e) {
@@ -529,14 +571,19 @@
                 clearTouchIndicators();
             }, 2000);
 
-            if (mouseClicks.length === 3) {
+            if (mouseClicks.length === 3 && circles.length < maxCircles) {
                 const newCircle = calculateCircle(mouseClicks[0], mouseClicks[1], mouseClicks[2]);
-                if (newCircle) {
-                    circle = newCircle;
+                if (newCircle && !circles.some(c => 
+                    Math.abs(c.x - newCircle.x) < 50 && Math.abs(c.y - newCircle.y) < 50
+                )) {
+                    circles.push(newCircle);
                     const centroid = getCentroid(mouseClicks);
-                    dragOffset.x = centroid.x - circle.x;
-                    dragOffset.y = centroid.y - circle.y;
-                    startCircleAnimation(circle);
+                    newCircle.dragOffset = {
+                        x: centroid.x - newCircle.x,
+                        y: centroid.y - newCircle.y
+                    };
+                    newCircle.isMouseControlled = true;
+                    startCircleAnimation(newCircle);
                 }
 
                 setTimeout(() => {
@@ -544,19 +591,22 @@
                     clearTouchIndicators();
                 }, 500);
             }
-            resetInactivityTimer();
+            circles.forEach(circle => resetInactivityTimer(circle.id));
         }
 
         function handleMouseMove(e) {
-            if (circle && mouseClicks.length === 3) {
-                const mousePos = { x: e.clientX, y: e.clientY };
-                if (!circle.targetX) circle.targetX = circle.x;
-                if (!circle.targetY) circle.targetY = circle.y;
-                circle.targetX = mousePos.x - dragOffset.x;
-                circle.targetY = mousePos.y - dragOffset.y;
-                circle.x += (circle.targetX - circle.x) * 0.15;
-                circle.y += (circle.targetY - circle.y) * 0.15;
-                resetInactivityTimer();
+            const mousePos = { x: e.clientX, y: e.clientY };
+            
+            // Update the most recently created mouse-controlled circle
+            const mouseCircle = circles.filter(c => c.isMouseControlled).pop();
+            if (mouseCircle && mouseClicks.length === 3) {
+                if (!mouseCircle.targetX) mouseCircle.targetX = mouseCircle.x;
+                if (!mouseCircle.targetY) mouseCircle.targetY = mouseCircle.y;
+                mouseCircle.targetX = mousePos.x - mouseCircle.dragOffset.x;
+                mouseCircle.targetY = mousePos.y - mouseCircle.dragOffset.y;
+                mouseCircle.x += (mouseCircle.targetX - mouseCircle.x) * 0.15;
+                mouseCircle.y += (mouseCircle.targetY - mouseCircle.y) * 0.15;
+                resetInactivityTimer(mouseCircle.id);
             }
         }
 
@@ -570,118 +620,109 @@
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             const staticLayer = document.querySelector('.static-layer');
 
-            if (circle) {
-                // Update animation
-                if (isAnimating) {
-                    const elapsed = Date.now() - animationStartTime;
-                    const progress = Math.min(elapsed / animationDuration, 1);
+            if (circles.length > 0) {
+                // Update all circles
+                circles.forEach((circle, index) => {
+                    // Update animation
+                    if (circle.isAnimating) {
+                        const elapsed = Date.now() - circle.animationStartTime;
+                        const progress = Math.min(elapsed / animationDuration, 1);
 
-                    if (progress < 1) {
-                        circle.scale = easeOutElastic(progress);
-                        circle.opacity = easeOutCubic(progress);
-                    } else {
-                        isAnimating = false;
-                        circle.scale = 1;
-                        circle.opacity = 1;
+                        if (progress < 1) {
+                            circle.scale = easeOutElastic(progress);
+                            circle.opacity = easeOutCubic(progress);
+                        } else {
+                            circle.isAnimating = false;
+                            circle.scale = 1;
+                            circle.opacity = 1;
+                        }
+                    } else if (circle.isDisappearing) {
+                        const elapsed = Date.now() - circle.disappearStartTime;
+                        const progress = Math.min(elapsed / disappearDuration, 1);
+
+                        if (progress < 1) {
+                            circle.opacity = 1 - easeOutCubic(progress);
+                        } else {
+                            removeCircle(circle.id);
+                            return;
+                        }
                     }
-                } else if (isDisappearing) {
-                    const elapsed = Date.now() - disappearStartTime;
-                    const progress = Math.min(elapsed / disappearDuration, 1);
+                });
 
-                    if (progress < 1) {
-                        circle.opacity = 1 - easeOutCubic(progress);
-                    } else {
-                        circle = null;
-                        isDisappearing = false;
-                        isCircleActive = false;
-                        showUI = true;
-                        staticLayer.style.clipPath = 'none';
-                        document.getElementById('showUIBtn').classList.remove('hidden');
-                        updateStatusText('');
-                        return;
-                    }
-                }
+                // Create composite mask for multiple circles
+                const maskGradients = [];
+                circles.forEach(circle => {
+                    const currentScale = circle.scale || 1;
+                    const currentRadius = circle.radius * currentScale;
+                    maskGradients.push(
+                        `radial-gradient(circle at ${circle.x}px ${circle.y}px, transparent ${currentRadius}px, black ${currentRadius + 2}px)`
+                    );
+                });
 
-                isCircleActive = true;
-                updateStatusText('✓ Circle active! Revealing animations below!');
-
-                const currentScale = circle.scale || 1;
-                const currentOpacity = circle.opacity || 1;
-                const currentRadius = circle.radius * currentScale;
-
-                // Apply circular clip-path to static layer to reveal animations below
-                const clipPath = `circle(${currentRadius}px at ${circle.x}px ${circle.y}px)`;
-                staticLayer.style.clipPath = `polygon(0% 0%, 0% 100%, ${circle.x - currentRadius}px 100%, ${circle.x - currentRadius}px ${circle.y + currentRadius}px, ${circle.x + currentRadius}px ${circle.y + currentRadius}px, ${circle.x + currentRadius}px ${circle.y - currentRadius}px, ${circle.x - currentRadius}px ${circle.y - currentRadius}px, ${circle.x - currentRadius}px 0%, 100% 0%, 100% 100%, 0% 100%), circle(${currentRadius}px at ${circle.x}px ${circle.y}px)`;
-                staticLayer.style.clipRule = 'exclude';
-
-                // Actually, let's use a simpler approach with inverse clip-path
-                staticLayer.style.clipPath = `polygon(0% 0%, 0% 100%, 100% 100%, 100% 0%) subtract circle(${currentRadius}px at ${circle.x}px ${circle.y}px)`;
-
-                // Since subtract isn't well supported, let's use a different approach
-                // Create a complex polygon that excludes the circle area
-                const steps = 32; // Number of points to approximate the circle
-                let polygonPoints = ['0% 0%', '0% 100%', '100% 100%', '100% 0%'];
-                
-                // Add circle cutout points
-                for (let i = 0; i <= steps; i++) {
-                    const angle = (i / steps) * 2 * Math.PI;
-                    const x = circle.x + Math.cos(angle) * currentRadius;
-                    const y = circle.y + Math.sin(angle) * currentRadius;
-                    if (i === 0) {
-                        polygonPoints.push(`${x}px ${y}px`);
-                    } else {
-                        polygonPoints.push(`${x}px ${y}px`);
-                    }
-                }
-                
-                // Use CSS mask to create a hole in the static layer revealing animations below
+                // Apply composite mask
                 staticLayer.style.clipPath = 'none';
-                staticLayer.style.mask = `radial-gradient(circle at ${circle.x}px ${circle.y}px, transparent ${currentRadius}px, black ${currentRadius + 2}px)`;
-                staticLayer.style.webkitMask = `radial-gradient(circle at ${circle.x}px ${circle.y}px, transparent ${currentRadius}px, black ${currentRadius + 2}px)`;
-                staticLayer.style.maskComposite = 'subtract';
-                staticLayer.style.webkitMaskComposite = 'subtract';
+                if (maskGradients.length === 1) {
+                    staticLayer.style.mask = maskGradients[0];
+                    staticLayer.style.webkitMask = maskGradients[0];
+                } else {
+                    // For multiple circles, we need to combine masks
+                    const combinedMask = maskGradients.join(', ');
+                    staticLayer.style.mask = combinedMask;
+                    staticLayer.style.webkitMask = combinedMask;
+                    staticLayer.style.maskComposite = 'add';
+                    staticLayer.style.webkitMaskComposite = 'add';
+                }
 
-                // Draw circle border on canvas
-                const gradient = ctx.createLinearGradient(
-                    circle.x - currentRadius,
-                    circle.y - currentRadius,
-                    circle.x + currentRadius,
-                    circle.y + currentRadius
-                );
-                gradient.addColorStop(0, `rgba(255, 255, 255, ${0.9 * currentOpacity})`);
-                gradient.addColorStop(1, `rgba(255, 255, 255, ${0.5 * currentOpacity})`);
+                // Draw all circles
+                circles.forEach(circle => {
+                    const currentScale = circle.scale || 1;
+                    const currentOpacity = circle.opacity || 1;
+                    const currentRadius = circle.radius * currentScale;
 
-                ctx.beginPath();
-                ctx.arc(circle.x, circle.y, currentRadius, 0, 2 * Math.PI);
-                ctx.strokeStyle = gradient;
-                ctx.lineWidth = 3;
-                ctx.stroke();
-
-                // Center point with pulse
-                const pulseSize = (3 + Math.sin(Date.now() / 200) * 1) * currentScale;
-                ctx.beginPath();
-                ctx.arc(circle.x, circle.y, pulseSize, 0, 2 * Math.PI);
-                ctx.fillStyle = `rgba(255, 255, 255, ${0.8 * currentOpacity})`;
-                ctx.fill();
-
-                // Ripple effect during animation
-                if (isAnimating) {
-                    const rippleProgress = ((Date.now() - animationStartTime) % 1000) / 1000;
-                    const rippleRadius = currentRadius + rippleProgress * 50;
-                    const rippleOpacity = (1 - rippleProgress) * 0.4 * currentOpacity;
+                    // Draw circle border on canvas
+                    const gradient = ctx.createLinearGradient(
+                        circle.x - currentRadius,
+                        circle.y - currentRadius,
+                        circle.x + currentRadius,
+                        circle.y + currentRadius
+                    );
+                    gradient.addColorStop(0, `rgba(255, 255, 255, ${0.9 * currentOpacity})`);
+                    gradient.addColorStop(1, `rgba(255, 255, 255, ${0.5 * currentOpacity})`);
 
                     ctx.beginPath();
-                    ctx.arc(circle.x, circle.y, rippleRadius, 0, 2 * Math.PI);
-                    ctx.strokeStyle = `rgba(20, 184, 166, ${rippleOpacity})`;
-                    ctx.lineWidth = 2;
+                    ctx.arc(circle.x, circle.y, currentRadius, 0, 2 * Math.PI);
+                    ctx.strokeStyle = gradient;
+                    ctx.lineWidth = 3;
                     ctx.stroke();
-                }
+
+                    // Center point with pulse
+                    const pulseSize = (3 + Math.sin(Date.now() / 200) * 1) * currentScale;
+                    ctx.beginPath();
+                    ctx.arc(circle.x, circle.y, pulseSize, 0, 2 * Math.PI);
+                    ctx.fillStyle = `rgba(255, 255, 255, ${0.8 * currentOpacity})`;
+                    ctx.fill();
+
+                    // Ripple effect during animation
+                    if (circle.isAnimating) {
+                        const rippleProgress = ((Date.now() - circle.animationStartTime) % 1000) / 1000;
+                        const rippleRadius = currentRadius + rippleProgress * 50;
+                        const rippleOpacity = (1 - rippleProgress) * 0.4 * currentOpacity;
+
+                        ctx.beginPath();
+                        ctx.arc(circle.x, circle.y, rippleRadius, 0, 2 * Math.PI);
+                        ctx.strokeStyle = `rgba(20, 184, 166, ${rippleOpacity})`;
+                        ctx.lineWidth = 2;
+                        ctx.stroke();
+                    }
+                });
+
+                updateStatusText(`✓ ${circles.length} circle${circles.length > 1 ? 's' : ''} active! Revealing animations below!`);
             } else {
-                isCircleActive = false;
-                // Remove mask when no circle
+                // Remove mask when no circles
                 staticLayer.style.mask = 'none';
                 staticLayer.style.webkitMask = 'none';
                 staticLayer.style.clipPath = 'none';
+                updateStatusText('');
             }
         }
 
