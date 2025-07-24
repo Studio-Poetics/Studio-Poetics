@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Animated Touch Game</title>
+    <meta name="description" content="Reveal animations by creating circles with 3 touch points">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: black;
+            color: white;
+            overflow: hidden;
+            touch-action: none;
+            user-select: none;
+        }
+
+        .game-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            background: black;
+        }
+
+        .static-layer {
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+        }
+
+        .animated-layer {
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            grid-template-rows: repeat(4, 1fr);
+            width: 100%;
+            height: 100%;
+        }
+
+        .grid-item {
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+
+        .grid-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .canvas-layer {
+            position: absolute;
+            inset: 0;
+            z-index: 10;
+            cursor: crosshair;
+        }
+
+        .instructions {
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            z-index: 20;
+            max-width: 24rem;
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid #374151;
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            color: white;
+            transition: opacity 0.5s;
+        }
+
+        .instructions.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .instructions h1 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #14b8a6;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .instructions p {
+            margin-bottom: 1rem;
+            color: #9ca3af;
+            font-size: 0.875rem;
+        }
+
+        .instruction-box {
+            padding: 0.5rem;
+            border-radius: 0.25rem;
+            background: rgba(31, 41, 55, 0.5);
+            border: 1px solid #374151;
+            margin-bottom: 0.75rem;
+        }
+
+        .instruction-box h4 {
+            font-weight: 500;
+            color: #14b8a6;
+            margin-bottom: 0.25rem;
+            font-size: 0.875rem;
+        }
+
+        .instruction-box p {
+            margin: 0;
+            font-size: 0.875rem;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background: none;
+            border: none;
+            color: #9ca3af;
+            cursor: pointer;
+            font-size: 1.5rem;
+            width: 2rem;
+            height: 2rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .close-btn:hover {
+            color: white;
+            background: rgba(55, 65, 81, 0.5);
+        }
+
+        .show-ui-btn {
+            position: absolute;
+            bottom: 1rem;
+            right: 1rem;
+            z-index: 20;
+            background: rgba(0, 0, 0, 0.3);
+            border: none;
+            color: white;
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s;
+            opacity: 0.3;
+        }
+
+        .show-ui-btn:hover {
+            opacity: 1;
+            background: rgba(0, 0, 0, 0.6);
+        }
+
+        .show-ui-btn.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .touch-point {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: rgba(20, 184, 166, 0.3);
+            border: 2px solid rgb(20, 184, 166);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: 50;
+            box-shadow: 0 0 15px rgba(20, 184, 166, 0.7);
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+            50% { transform: translate(-50%, -50%) scale(1.1); opacity: 0.8; }
+            100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+        }
+
+        .status-text {
+            color: #14b8a6;
+            font-weight: 500;
+            margin-top: 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        .warning-text {
+            color: #f59e0b;
+            font-size: 0.875rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <!-- Static Image Layer -->
+        <div class="static-layer">
+            <div class="grid">
+                <div class="grid-item">
+                    <img src="/sketches/ttc/11.png" alt="Static image 11">
+                </div>
+                <div class="grid-item">
+                    <img src="/sketches/ttc/12.png" alt="Static image 12">
+                </div>
+                <div class="grid-item">
+                    <img src="/sketches/ttc/21.png" alt="Static image 21">
+                </div>
+                <div class="grid-item">
+                    <img src="/sketches/ttc/22.png" alt="Static image 22">
+                </div>
+                <div class="grid-item">
+                    <img src="/sketches/ttc/31.png" alt="Static image 31">
+                </div>
+                <div class="grid-item">
+                    <img src="/sketches/ttc/32.png" alt="Static image 32">
+                </div>
+                <div class="grid-item">
+                    <img src="/sketches/ttc/41.png" alt="Static image 41">
+                </div>
+                <div class="grid-item">
+                    <img src="/sketches/ttc/42.png" alt="Static image 42">
+                </div>
+            </div>
+        </div>
+
+        <!-- Animated GIF Layer -->
+        <div class="animated-layer">
+            <div class="grid">
+                <div class="grid-item">
+                    <img src="/sketches/ttc/11.gif" alt="Animated image 11">
+                </div>
+                <div class="grid-item">
+                    <img src="/sketches/ttc/12.gif" alt="Animated image 12">
+                </div>
+                <div class="grid-item">
+                    <img src="/sketches/ttc/21.gif" alt="Animated image 21">
+                </div>
+                <div class="grid-item">
+                    <img src="/sketches/ttc/22.gif" alt="Animated image 22">
+                </div>
+                <div class="grid-item">
+                    <img src="/sketches/ttc/31.gif" alt="Animated image 31">
+                </div>
+                <div class="grid-item">
+                    <img src="/sketches/ttc/32.gif" alt="Animated image 32">
+                </div>
+                <div class="grid-item">
+                    <img src="/sketches/ttc/41.gif" alt="Animated image 41">
+                </div>
+                <div class="grid-item">
+                    <img src="/sketches/ttc/42.gif" alt="Animated image 42">
+                </div>
+            </div>
+        </div>
+
+        <!-- Canvas for Circle Interaction -->
+        <canvas class="canvas-layer" id="gameCanvas"></canvas>
+
+        <!-- Instructions -->
+        <div class="instructions" id="instructions">
+            <button class="close-btn" onclick="hideInstructions()">&times;</button>
+            <h1>
+                <span>ℹ️</span>
+                Animated Touch Game
+            </h1>
+            <p>Reveal animations by creating circles with 3 touch points</p>
+            
+            <div class="instruction-box">
+                <h4 id="deviceInstructions">Desktop Instructions:</h4>
+                <p id="deviceInstructionsText">Click 3 different points quickly to create a circle and reveal animations</p>
+            </div>
+            
+            <p>Drag the circle around to reveal different animated areas</p>
+            <p class="warning-text">Circle will disappear after 10 seconds of inactivity</p>
+            <div id="statusText"></div>
+        </div>
+
+        <!-- Show UI Button -->
+        <button class="show-ui-btn hidden" id="showUIBtn" onclick="showInstructions()">ℹ️</button>
+    </div>
+
+    <script>
+        // Game state
+        let canvas, ctx;
+        let isMobile = false;
+        let showUI = true;
+        let isCircleActive = false;
+        let circle = null;
+        let touches = [];
+        let mouseClicks = [];
+        let touchIndicators = [];
+        let isDragging = false;
+        let dragOffset = { x: 0, y: 0 };
+        let inactivityTimer = null;
+        let isAnimating = false;
+        let isDisappearing = false;
+        let animationStartTime = 0;
+        let disappearStartTime = 0;
+        const animationDuration = 800;
+        const disappearDuration = 1000;
+
+        // Initialize game
+        function init() {
+            canvas = document.getElementById('gameCanvas');
+            ctx = canvas.getContext('2d');
+            
+            // Detect mobile
+            isMobile = 'ontouchstart' in window;
+            updateInstructions();
+            
+            // Setup canvas
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+            
+            // Add event listeners
+            if (isMobile) {
+                canvas.addEventListener('touchstart', handleTouchStart, { passive: false });
+                canvas.addEventListener('touchmove', handleTouchMove, { passive: false });
+                canvas.addEventListener('touchend', handleTouchEnd, { passive: false });
+            } else {
+                canvas.addEventListener('mousedown', handleMouseDown);
+                canvas.addEventListener('mousemove', handleMouseMove);
+            }
+            
+            // Start animation loop
+            animate();
+        }
+
+        function updateInstructions() {
+            const deviceInstructions = document.getElementById('deviceInstructions');
+            const deviceInstructionsText = document.getElementById('deviceInstructionsText');
+            
+            if (isMobile) {
+                deviceInstructions.textContent = 'Mobile Instructions:';
+                deviceInstructionsText.textContent = 'Touch with 3 fingers to create a circle and reveal animations';
+            } else {
+                deviceInstructions.textContent = 'Desktop Instructions:';
+                deviceInstructionsText.textContent = 'Click 3 different points quickly to create a circle and reveal animations';
+            }
+        }
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+
+        function hideInstructions() {
+            document.getElementById('instructions').classList.add('hidden');
+            document.getElementById('showUIBtn').classList.remove('hidden');
+        }
+
+        function showInstructions() {
+            document.getElementById('instructions').classList.remove('hidden');
+            document.getElementById('showUIBtn').classList.add('hidden');
+        }
+
+        function updateStatusText(text) {
+            const statusEl = document.getElementById('statusText');
+            statusEl.innerHTML = text ? `<div class="status-text">${text}</div>` : '';
+        }
+
+        // Touch indicator management
+        function createTouchIndicator(x, y) {
+            const indicator = document.createElement('div');
+            indicator.className = 'touch-point';
+            indicator.style.left = x + 'px';
+            indicator.style.top = y + 'px';
+            document.body.appendChild(indicator);
+            return indicator;
+        }
+
+        function clearTouchIndicators() {
+            touchIndicators.forEach(indicator => {
+                if (indicator.parentNode) {
+                    indicator.parentNode.removeChild(indicator);
+                }
+            });
+            touchIndicators = [];
+        }
+
+        // Circle calculation
+        function calculateCircle(p1, p2, p3) {
+            const ax = p1.x, ay = p1.y;
+            const bx = p2.x, by = p2.y;
+            const cx = p3.x, cy = p3.y;
+
+            const d = 2 * (ax * (by - cy) + bx * (cy - ay) + cx * (ay - by));
+            if (Math.abs(d) < 0.001) return null;
+
+            const ux = ((ax * ax + ay * ay) * (by - cy) + (bx * bx + by * by) * (cy - ay) + (cx * cx + cy * cy) * (ay - by)) / d;
+            const uy = ((ax * ax + ay * ay) * (cx - bx) + (bx * bx + by * by) * (ax - cx) + (cx * cx + cy * cy) * (bx - ax)) / d;
+
+            const radius = Math.sqrt((ax - ux) * (ax - ux) + (ay - uy) * (ay - uy));
+            return { x: ux, y: uy, radius: radius };
+        }
+
+        function getCentroid(points) {
+            const x = points.reduce((sum, p) => sum + p.x, 0) / points.length;
+            const y = points.reduce((sum, p) => sum + p.y, 0) / points.length;
+            return { x, y };
+        }
+
+        // Animation functions
+        function easeOutElastic(t) {
+            const c4 = (2 * Math.PI) / 3;
+            return t === 0 ? 0 : t === 1 ? 1 : Math.pow(2, -10 * t) * Math.sin((t * 10 - 0.75) * c4) + 1;
+        }
+
+        function easeOutCubic(t) {
+            return 1 - Math.pow(1 - t, 3);
+        }
+
+        function startCircleAnimation(newCircle) {
+            isAnimating = true;
+            animationStartTime = Date.now();
+            newCircle.scale = 0;
+            newCircle.opacity = 0;
+            resetInactivityTimer();
+        }
+
+        function resetInactivityTimer() {
+            isDisappearing = false;
+            
+            if (circle) {
+                document.getElementById('instructions').classList.add('hidden');
+                document.getElementById('showUIBtn').classList.add('hidden');
+                showUI = false;
+            }
+
+            if (inactivityTimer) {
+                clearTimeout(inactivityTimer);
+            }
+
+            inactivityTimer = setTimeout(() => {
+                if (circle) {
+                    isDisappearing = true;
+                    disappearStartTime = Date.now();
+                }
+            }, 10000);
+        }
+
+        // Event handlers
+        function handleTouchStart(e) {
+            e.preventDefault();
+            touches = Array.from(e.touches).map(touch => ({
+                id: touch.identifier,
+                x: touch.clientX,
+                y: touch.clientY
+            }));
+
+            clearTouchIndicators();
+            touches.forEach(touch => {
+                const indicator = createTouchIndicator(touch.x, touch.y);
+                touchIndicators.push(indicator);
+            });
+
+            if (touches.length === 3) {
+                const newCircle = calculateCircle(touches[0], touches[1], touches[2]);
+                if (newCircle) {
+                    circle = newCircle;
+                    const centroid = getCentroid(touches);
+                    dragOffset.x = centroid.x - circle.x;
+                    dragOffset.y = centroid.y - circle.y;
+                    isDragging = true;
+                    startCircleAnimation(circle);
+                }
+            }
+            resetInactivityTimer();
+        }
+
+        function handleTouchMove(e) {
+            e.preventDefault();
+            if (isDragging && touches.length === 3 && circle) {
+                const newTouches = Array.from(e.touches).map(touch => ({
+                    id: touch.identifier,
+                    x: touch.clientX,
+                    y: touch.clientY
+                }));
+
+                newTouches.forEach((touch, i) => {
+                    if (touchIndicators[i]) {
+                        touchIndicators[i].style.left = touch.x + 'px';
+                        touchIndicators[i].style.top = touch.y + 'px';
+                    }
+                });
+
+                const centroid = getCentroid(newTouches);
+                if (!circle.targetX) circle.targetX = circle.x;
+                if (!circle.targetY) circle.targetY = circle.y;
+
+                circle.targetX = centroid.x - dragOffset.x;
+                circle.targetY = centroid.y - dragOffset.y;
+                circle.x += (circle.targetX - circle.x) * 0.15;
+                circle.y += (circle.targetY - circle.y) * 0.15;
+                resetInactivityTimer();
+            }
+        }
+
+        function handleTouchEnd(e) {
+            e.preventDefault();
+            if (e.touches.length < 3) {
+                isDragging = false;
+                clearTouchIndicators();
+            }
+            resetInactivityTimer();
+        }
+
+        function handleMouseDown(e) {
+            const point = { x: e.clientX, y: e.clientY };
+            mouseClicks.push(point);
+
+            const indicator = createTouchIndicator(point.x, point.y);
+            touchIndicators.push(indicator);
+
+            setTimeout(() => {
+                mouseClicks = [];
+                clearTouchIndicators();
+            }, 2000);
+
+            if (mouseClicks.length === 3) {
+                const newCircle = calculateCircle(mouseClicks[0], mouseClicks[1], mouseClicks[2]);
+                if (newCircle) {
+                    circle = newCircle;
+                    const centroid = getCentroid(mouseClicks);
+                    dragOffset.x = centroid.x - circle.x;
+                    dragOffset.y = centroid.y - circle.y;
+                    startCircleAnimation(circle);
+                }
+
+                setTimeout(() => {
+                    mouseClicks = [];
+                    clearTouchIndicators();
+                }, 500);
+            }
+            resetInactivityTimer();
+        }
+
+        function handleMouseMove(e) {
+            if (circle && mouseClicks.length === 3) {
+                const mousePos = { x: e.clientX, y: e.clientY };
+                if (!circle.targetX) circle.targetX = circle.x;
+                if (!circle.targetY) circle.targetY = circle.y;
+                circle.targetX = mousePos.x - dragOffset.x;
+                circle.targetY = mousePos.y - dragOffset.y;
+                circle.x += (circle.targetX - circle.x) * 0.15;
+                circle.y += (circle.targetY - circle.y) * 0.15;
+                resetInactivityTimer();
+            }
+        }
+
+        // Animation loop
+        function animate() {
+            drawScene();
+            requestAnimationFrame(animate);
+        }
+
+        function drawScene() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const staticLayer = document.querySelector('.static-layer');
+
+            if (circle) {
+                // Update animation
+                if (isAnimating) {
+                    const elapsed = Date.now() - animationStartTime;
+                    const progress = Math.min(elapsed / animationDuration, 1);
+
+                    if (progress < 1) {
+                        circle.scale = easeOutElastic(progress);
+                        circle.opacity = easeOutCubic(progress);
+                    } else {
+                        isAnimating = false;
+                        circle.scale = 1;
+                        circle.opacity = 1;
+                    }
+                } else if (isDisappearing) {
+                    const elapsed = Date.now() - disappearStartTime;
+                    const progress = Math.min(elapsed / disappearDuration, 1);
+
+                    if (progress < 1) {
+                        circle.opacity = 1 - easeOutCubic(progress);
+                    } else {
+                        circle = null;
+                        isDisappearing = false;
+                        isCircleActive = false;
+                        showUI = true;
+                        staticLayer.style.clipPath = 'none';
+                        document.getElementById('showUIBtn').classList.remove('hidden');
+                        updateStatusText('');
+                        return;
+                    }
+                }
+
+                isCircleActive = true;
+                updateStatusText('✓ Circle active! Revealing animations below!');
+
+                const currentScale = circle.scale || 1;
+                const currentOpacity = circle.opacity || 1;
+                const currentRadius = circle.radius * currentScale;
+
+                // Apply circular clip-path to static layer to reveal animations below
+                const clipPath = `circle(${currentRadius}px at ${circle.x}px ${circle.y}px)`;
+                staticLayer.style.clipPath = `polygon(0% 0%, 0% 100%, ${circle.x - currentRadius}px 100%, ${circle.x - currentRadius}px ${circle.y + currentRadius}px, ${circle.x + currentRadius}px ${circle.y + currentRadius}px, ${circle.x + currentRadius}px ${circle.y - currentRadius}px, ${circle.x - currentRadius}px ${circle.y - currentRadius}px, ${circle.x - currentRadius}px 0%, 100% 0%, 100% 100%, 0% 100%), circle(${currentRadius}px at ${circle.x}px ${circle.y}px)`;
+                staticLayer.style.clipRule = 'exclude';
+
+                // Actually, let's use a simpler approach with inverse clip-path
+                staticLayer.style.clipPath = `polygon(0% 0%, 0% 100%, 100% 100%, 100% 0%) subtract circle(${currentRadius}px at ${circle.x}px ${circle.y}px)`;
+
+                // Since subtract isn't well supported, let's use a different approach
+                // Create a complex polygon that excludes the circle area
+                const steps = 32; // Number of points to approximate the circle
+                let polygonPoints = ['0% 0%', '0% 100%', '100% 100%', '100% 0%'];
+                
+                // Add circle cutout points
+                for (let i = 0; i <= steps; i++) {
+                    const angle = (i / steps) * 2 * Math.PI;
+                    const x = circle.x + Math.cos(angle) * currentRadius;
+                    const y = circle.y + Math.sin(angle) * currentRadius;
+                    if (i === 0) {
+                        polygonPoints.push(`${x}px ${y}px`);
+                    } else {
+                        polygonPoints.push(`${x}px ${y}px`);
+                    }
+                }
+                
+                // Use CSS mask to create a hole in the static layer revealing animations below
+                staticLayer.style.clipPath = 'none';
+                staticLayer.style.mask = `radial-gradient(circle at ${circle.x}px ${circle.y}px, transparent ${currentRadius}px, black ${currentRadius + 2}px)`;
+                staticLayer.style.webkitMask = `radial-gradient(circle at ${circle.x}px ${circle.y}px, transparent ${currentRadius}px, black ${currentRadius + 2}px)`;
+                staticLayer.style.maskComposite = 'subtract';
+                staticLayer.style.webkitMaskComposite = 'subtract';
+
+                // Draw circle border on canvas
+                const gradient = ctx.createLinearGradient(
+                    circle.x - currentRadius,
+                    circle.y - currentRadius,
+                    circle.x + currentRadius,
+                    circle.y + currentRadius
+                );
+                gradient.addColorStop(0, `rgba(255, 255, 255, ${0.9 * currentOpacity})`);
+                gradient.addColorStop(1, `rgba(255, 255, 255, ${0.5 * currentOpacity})`);
+
+                ctx.beginPath();
+                ctx.arc(circle.x, circle.y, currentRadius, 0, 2 * Math.PI);
+                ctx.strokeStyle = gradient;
+                ctx.lineWidth = 3;
+                ctx.stroke();
+
+                // Center point with pulse
+                const pulseSize = (3 + Math.sin(Date.now() / 200) * 1) * currentScale;
+                ctx.beginPath();
+                ctx.arc(circle.x, circle.y, pulseSize, 0, 2 * Math.PI);
+                ctx.fillStyle = `rgba(255, 255, 255, ${0.8 * currentOpacity})`;
+                ctx.fill();
+
+                // Ripple effect during animation
+                if (isAnimating) {
+                    const rippleProgress = ((Date.now() - animationStartTime) % 1000) / 1000;
+                    const rippleRadius = currentRadius + rippleProgress * 50;
+                    const rippleOpacity = (1 - rippleProgress) * 0.4 * currentOpacity;
+
+                    ctx.beginPath();
+                    ctx.arc(circle.x, circle.y, rippleRadius, 0, 2 * Math.PI);
+                    ctx.strokeStyle = `rgba(20, 184, 166, ${rippleOpacity})`;
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                }
+            } else {
+                isCircleActive = false;
+                // Remove mask when no circle
+                staticLayer.style.mask = 'none';
+                staticLayer.style.webkitMask = 'none';
+                staticLayer.style.clipPath = 'none';
+            }
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
