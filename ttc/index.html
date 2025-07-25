@@ -285,7 +285,7 @@
             <p>Multiple circles supported! Up to 3 circles can exist simultaneously</p>
             <p>Drag circles around to reveal different animated areas</p>
             <p>Spread or pinch your 3 fingers to expand or contract the circle size</p>
-            <p class="warning-text">Circles will disappear after 10 seconds of inactivity</p>
+            <p class="warning-text">Circles disappear immediately when you lift your fingers</p>
             <div id="statusText"></div>
         </div>
 
@@ -342,10 +342,10 @@
             
             if (isMobile) {
                 deviceInstructions.textContent = 'Mobile Instructions:';
-                deviceInstructionsText.textContent = 'Touch with 3 fingers to create a circle. Spread/pinch to resize. Multiple circles supported!';
+                deviceInstructionsText.textContent = 'Touch with 3 fingers to create a circle. Lift fingers to remove. Spread/pinch to resize!';
             } else {
                 deviceInstructions.textContent = 'Desktop Instructions:';
-                deviceInstructionsText.textContent = 'Click 3 different points quickly to create a circle. Scroll wheel over circle to resize!';
+                deviceInstructionsText.textContent = 'Click 3 different points quickly to create a circle. Scroll wheel over circle to resize. Circles disappear after 10 seconds.';
             }
         }
 
@@ -466,7 +466,11 @@
             newCircle.scale = 0;
             newCircle.opacity = 0;
             newCircle.isDisappearing = false;
-            resetInactivityTimer(newCircle.id);
+            
+            // Only set inactivity timer for mouse-controlled circles
+            if (newCircle.isMouseControlled) {
+                resetInactivityTimer(newCircle.id);
+            }
         }
 
         function resetInactivityTimer(circleId) {
@@ -555,6 +559,7 @@
                         };
                         newCircle.touchIds = touchGroup.map(t => t.id);
                         newCircle.currentTouches = [...touchGroup];
+                        newCircle.isTouchControlled = true; // Mark as touch-controlled
                         startCircleAnimation(newCircle);
                         
                         // Mark these touches as used
@@ -564,9 +569,6 @@
                     }
                 }
             }
-            
-            // Reset timers for all circles
-            circles.forEach(circle => resetInactivityTimer(circle.id));
         }
 
         function handleTouchMove(e) {
@@ -615,7 +617,7 @@
                             // Store current touches for next frame
                             circle.currentTouches = orderedTouches;
                             
-                            resetInactivityTimer(circle.id);
+                            // Don't reset timer for touch-controlled circles - they disappear when touch ends
                         }
                     }
                 }
@@ -625,29 +627,33 @@
         function handleTouchEnd(e) {
             e.preventDefault();
             const remainingTouches = Array.from(e.touches).map(touch => touch.identifier);
+            const circlesToRemove = [];
             
-            // Clean up circles that no longer have enough touches
+            // Find circles that no longer have enough touches and mark them for removal
             circles.forEach(circle => {
                 if (circle.touchIds) {
                     const activeTouches = circle.touchIds.filter(id => remainingTouches.includes(id));
                     if (activeTouches.length < 3) {
-                        circle.touchIds = null; // Stop dragging this circle
-                        console.log(`Circle ${circle.id} lost touch control, ${activeTouches.length}/3 touches remaining`);
+                        console.log(`Circle ${circle.id} lost touch control, ${activeTouches.length}/3 touches remaining - removing immediately`);
+                        circlesToRemove.push(circle.id);
                     }
                 }
             });
             
+            // Remove circles that lost their touches
+            circlesToRemove.forEach(id => removeCircle(id));
+            
             if (e.touches.length === 0) {
                 clearTouchIndicators();
                 console.log('All touches ended, cleared indicators');
+                // Remove any remaining circles when all touches are gone
+                const remainingCircles = [...circles];
+                remainingCircles.forEach(circle => {
+                    if (circle.touchIds) { // Only remove touch-controlled circles
+                        removeCircle(circle.id);
+                    }
+                });
             }
-            
-            // Only reset timers for circles that still exist
-            circles.forEach(circle => {
-                if (circle && circle.id) {
-                    resetInactivityTimer(circle.id);
-                }
-            });
         }
 
         function handleMouseDown(e) {
@@ -710,7 +716,11 @@
                 mouseCircle.targetY = mousePos.y - mouseCircle.dragOffset.y;
                 mouseCircle.x += (mouseCircle.targetX - mouseCircle.x) * 0.15;
                 mouseCircle.y += (mouseCircle.targetY - mouseCircle.y) * 0.15;
-                resetInactivityTimer(mouseCircle.id);
+                
+                // Reset timer for mouse-controlled circles
+                if (mouseCircle.isMouseControlled) {
+                    resetInactivityTimer(mouseCircle.id);
+                }
             }
         }
         
@@ -743,7 +753,10 @@
                 const maxRadius = closestCircle.baseRadius * 3.0;
                 closestCircle.radius = Math.max(minRadius, Math.min(maxRadius, newRadius));
                 
-                resetInactivityTimer(closestCircle.id);
+                // Reset timer only for mouse-controlled circles
+                if (closestCircle.isMouseControlled) {
+                    resetInactivityTimer(closestCircle.id);
+                }
             }
         }
 
