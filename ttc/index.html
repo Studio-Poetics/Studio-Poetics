@@ -286,6 +286,7 @@
             <p>Drag circles around to reveal different animated areas</p>
             <p>Spread or pinch your 3 fingers to expand or contract the circle size</p>
             <p class="warning-text">Circles disappear immediately when you lift your fingers</p>
+            <p style="font-size: 0.75rem; color: #6b7280; margin-top: 0.5rem;">Debug: Open console and type 'clearAllCircles()' to force remove stuck circles</p>
             <div id="statusText"></div>
         </div>
 
@@ -501,6 +502,12 @@
         
         function removeCircle(circleId) {
             const initialLength = circles.length;
+            const circleToRemove = circles.find(c => c.id === circleId);
+            
+            if (circleToRemove) {
+                console.log(`Removing circle ${circleId} (${circleToRemove.isTouchControlled ? 'touch' : 'mouse'}-controlled)`);
+            }
+            
             circles = circles.filter(c => c.id !== circleId);
             
             if (inactivityTimers.has(circleId)) {
@@ -517,15 +524,23 @@
                 showUI = true;
                 document.getElementById('showUIBtn').classList.remove('hidden');
                 updateStatusText('');
+                console.log('All circles removed - cleaned up UI');
             }
             
-            // Log for debugging
-            console.log(`Removed circle ${circleId}, ${initialLength} -> ${circles.length} circles`);
+            console.log(`Circle removed: ${initialLength} -> ${circles.length} circles remaining`);
         }
 
         // Event handlers
         function handleTouchStart(e) {
             e.preventDefault();
+            
+            // Clear any existing touch-controlled circles first
+            const touchCirclesToRemove = circles.filter(c => c.isTouchControlled).map(c => c.id);
+            touchCirclesToRemove.forEach(id => {
+                console.log(`Removing existing touch circle ${id} on new touch start`);
+                removeCircle(id);
+            });
+            
             touches = Array.from(e.touches).map(touch => ({
                 id: touch.identifier,
                 x: touch.clientX,
@@ -548,9 +563,7 @@
                     const touchGroup = availableTouches.splice(0, 3);
                     const newCircle = calculateCircle(touchGroup[0], touchGroup[1], touchGroup[2]);
                     
-                    if (newCircle && !circles.some(c => 
-                        Math.abs(c.x - newCircle.x) < 80 && Math.abs(c.y - newCircle.y) < 80
-                    )) {
+                    if (newCircle && newCircle.radius > 10) {
                         circles.push(newCircle);
                         const centroid = getCentroid(touchGroup);
                         newCircle.dragOffset = {
@@ -561,6 +574,8 @@
                         newCircle.currentTouches = [...touchGroup];
                         newCircle.isTouchControlled = true; // Mark as touch-controlled
                         startCircleAnimation(newCircle);
+                        
+                        console.log(`Created touch circle ${newCircle.id} with touches:`, newCircle.touchIds);
                         
                         // Mark these touches as used
                         touchGroup.forEach(touch => usedTouchIds.add(touch.id));
@@ -609,10 +624,11 @@
                             if (!circle.targetX) circle.targetX = circle.x;
                             if (!circle.targetY) circle.targetY = circle.y;
 
+                            // More responsive dragging with higher interpolation factor
                             circle.targetX = centroid.x - circle.dragOffset.x;
                             circle.targetY = centroid.y - circle.dragOffset.y;
-                            circle.x += (circle.targetX - circle.x) * 0.15;
-                            circle.y += (circle.targetY - circle.y) * 0.15;
+                            circle.x += (circle.targetX - circle.x) * 0.4; // Increased from 0.15 for smoother dragging
+                            circle.y += (circle.targetY - circle.y) * 0.4;
                             
                             // Store current touches for next frame
                             circle.currentTouches = orderedTouches;
@@ -629,12 +645,16 @@
             const remainingTouches = Array.from(e.touches).map(touch => touch.identifier);
             const circlesToRemove = [];
             
-            // Find circles that no longer have enough touches and mark them for removal
+            console.log(`Touch end event: ${remainingTouches.length} touches remaining`, remainingTouches);
+            
+            // Always check all touch-controlled circles
             circles.forEach(circle => {
-                if (circle.touchIds) {
+                if (circle.isTouchControlled && circle.touchIds) {
                     const activeTouches = circle.touchIds.filter(id => remainingTouches.includes(id));
+                    console.log(`Circle ${circle.id}: ${activeTouches.length}/3 required touches active`);
+                    
                     if (activeTouches.length < 3) {
-                        console.log(`Circle ${circle.id} lost touch control, ${activeTouches.length}/3 touches remaining - removing immediately`);
+                        console.log(`Marking circle ${circle.id} for removal - insufficient touches`);
                         circlesToRemove.push(circle.id);
                     }
                 }
@@ -643,15 +663,15 @@
             // Remove circles that lost their touches
             circlesToRemove.forEach(id => removeCircle(id));
             
+            // When all touches are gone, force remove ALL touch-controlled circles
             if (e.touches.length === 0) {
                 clearTouchIndicators();
-                console.log('All touches ended, cleared indicators');
-                // Remove any remaining circles when all touches are gone
-                const remainingCircles = [...circles];
-                remainingCircles.forEach(circle => {
-                    if (circle.touchIds) { // Only remove touch-controlled circles
-                        removeCircle(circle.id);
-                    }
+                console.log('All touches ended - force removing all touch circles');
+                
+                const allTouchCircles = circles.filter(c => c.isTouchControlled).map(c => c.id);
+                allTouchCircles.forEach(id => {
+                    console.log(`Force removing touch circle ${id}`);
+                    removeCircle(id);
                 });
             }
         }
@@ -714,8 +734,8 @@
                 if (!mouseCircle.targetY) mouseCircle.targetY = mouseCircle.y;
                 mouseCircle.targetX = mousePos.x - mouseCircle.dragOffset.x;
                 mouseCircle.targetY = mousePos.y - mouseCircle.dragOffset.y;
-                mouseCircle.x += (mouseCircle.targetX - mouseCircle.x) * 0.15;
-                mouseCircle.y += (mouseCircle.targetY - mouseCircle.y) * 0.15;
+                mouseCircle.x += (mouseCircle.targetX - mouseCircle.x) * 0.4; // Smoother mouse dragging
+                mouseCircle.y += (mouseCircle.targetY - mouseCircle.y) * 0.4;
                 
                 // Reset timer for mouse-controlled circles
                 if (mouseCircle.isMouseControlled) {
@@ -905,6 +925,18 @@
                 <rect width="100%" height="100%" fill="black" mask="url(#holes)"/>
             </svg>`;
         }
+        
+        // Debug function to force clear all circles (can be called from console)
+        function clearAllCircles() {
+            console.log(`Force clearing ${circles.length} circles`);
+            const allCircleIds = circles.map(c => c.id);
+            allCircleIds.forEach(id => removeCircle(id));
+            clearTouchIndicators();
+            console.log('All circles cleared');
+        }
+        
+        // Make it globally accessible for debugging
+        window.clearAllCircles = clearAllCircles;
         
         // Initialize when page loads
         document.addEventListener('DOMContentLoaded', init);
