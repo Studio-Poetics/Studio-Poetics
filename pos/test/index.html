@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Poetics of Sensors - P5.js Test Template</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #0d1117;
+            color: #ffffff;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            overflow: hidden;
+        }
+        
+        .info-panel {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 14px;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .connection-status {
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+        
+        .status-connected {
+            color: #00ff88;
+        }
+        
+        .status-disconnected {
+            color: #ff4757;
+        }
+        
+        .sensor-data {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+        }
+        
+        .gps-display {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .instructions {
+            position: fixed;
+            bottom: 10px;
+            left: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 12px;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            max-width: 300px;
+        }
+        
+        .instructions h3 {
+            margin: 0 0 10px 0;
+            color: #00ff88;
+        }
+        
+        .instructions ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+        
+        .instructions li {
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Connection Status and Sensor Data Display -->
+    <div class="info-panel">
+        <div class="connection-status" id="connectionStatus">
+            Disconnected from sensor app
+        </div>
+        <div class="sensor-data" id="sensorData">
+            <div>Accel: 0.00, 0.00, 0.00</div>
+            <div>Gyro: 0.00, 0.00, 0.00</div>
+            <div>Orient: 0°, 0°, 0°</div>
+            <div>Touch: 0.00, 0.00</div>
+        </div>
+    </div>
+    
+    <!-- GPS Display -->
+    <div class="gps-display" id="gpsDisplay">
+        <div>📍 GPS Location</div>
+        <div id="gpsCoords">Lat: 0.000000</div>
+        <div id="gpsLng">Lng: 0.000000</div>
+        <div id="gpsAccuracy">Accuracy: 0m</div>
+    </div>
+    
+    <!-- Instructions -->
+    <div class="instructions">
+        <h3>📱 How to Connect</h3>
+        <ul>
+            <li>Start WebSocket server: <code>node ../server-example.js</code></li>
+            <li>Open Poetics app on phone</li>
+            <li>Connect to this computer's IP:8080</li>
+            <li>Move phone to rotate cube</li>
+            <li>Touch screen to create sparkles</li>
+            <li>Enable GPS for location display</li>
+        </ul>
+    </div>
+
+    <!-- P5.js Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.7.0/p5.min.js"></script>
+    
+    <!-- WebSocket Connection and Sensor Data Handler -->
+    <script src="sensor-receiver.js"></script>
+    
+    <!-- Main P5.js Sketch -->
+    <script src="sketch.js"></script>
+</body>
+</html>

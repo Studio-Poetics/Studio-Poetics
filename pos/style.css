@@ -1,0 +1,411 @@
+/* ===============================================
+   POETICS OF SENSORS - PWA STYLES
+   =============================================== */
+
+:root {
+    --primary: #1a1a2e;
+    --secondary: #16213e;
+    --accent: #0f3460;
+    --success: #00ff88;
+    --warning: #ffaa00;
+    --error: #ff4757;
+    --text: #ffffff;
+    --text-muted: #b8b8b8;
+    --bg: #0d1117;
+    --surface: #161b22;
+    --border: #30363d;
+    --shadow: rgba(0, 0, 0, 0.3);
+}
+
+/* Reset and Base Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+}
+
+/* App Container */
+.app-container {
+    max-width: 480px;
+    margin: 0 auto;
+    padding: 0;
+    min-height: 100vh;
+    background: linear-gradient(135deg, var(--bg) 0%, var(--primary) 100%);
+}
+
+/* Header */
+.header {
+    background: var(--surface);
+    padding: 1rem;
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    backdrop-filter: blur(10px);
+}
+
+.app-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    background: linear-gradient(45deg, var(--success), #00d4ff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.connection-status {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.status-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--error);
+    transition: background-color 0.3s ease;
+}
+
+.status-dot.connected {
+    background: var(--success);
+}
+
+/* Sections */
+section {
+    background: var(--surface);
+    margin: 1rem;
+    padding: 1.5rem;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    box-shadow: 0 4px 20px var(--shadow);
+}
+
+section h2 {
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+    color: var(--text);
+    font-weight: 600;
+}
+
+/* Input Groups */
+.input-group {
+    margin-bottom: 1rem;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: var(--text-muted);
+}
+
+.input-group input[type="text"],
+.input-group input[type="number"] {
+    width: 100%;
+    padding: 0.75rem;
+    background: var(--accent);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-size: 1rem;
+}
+
+.input-group input[type="range"] {
+    width: 70%;
+    margin-right: 0.5rem;
+}
+
+/* Buttons */
+.btn {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 100%;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.btn.primary {
+    background: linear-gradient(45deg, var(--success), #00d4ff);
+    color: var(--primary);
+}
+
+.btn.primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 255, 136, 0.3);
+}
+
+.btn.secondary {
+    background: var(--accent);
+    color: var(--text);
+    border: 1px solid var(--border);
+}
+
+.btn.secondary:hover {
+    background: var(--secondary);
+}
+
+.btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Sensor Grid */
+.sensor-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+}
+
+.sensor-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem;
+    background: var(--accent);
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.sensor-toggle:hover {
+    background: var(--secondary);
+}
+
+.sensor-toggle input[type="checkbox"] {
+    margin-right: 0.75rem;
+    transform: scale(1.2);
+}
+
+.sensor-name {
+    flex: 1;
+    font-weight: 500;
+}
+
+.sensor-status {
+    font-size: 0.8rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    background: var(--surface);
+    color: var(--text-muted);
+}
+
+.sensor-status.active {
+    background: var(--success);
+    color: var(--primary);
+}
+
+.sensor-status.error {
+    background: var(--error);
+    color: var(--text);
+}
+
+/* Data Display */
+.data-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.data-card {
+    background: var(--accent);
+    padding: 1rem;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    text-align: center;
+}
+
+.data-card h3 {
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.data-value {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--success);
+    font-family: 'Courier New', monospace;
+}
+
+.data-xyz {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 0.5rem;
+    font-size: 0.8rem;
+    font-family: 'Courier New', monospace;
+}
+
+.data-xyz span {
+    padding: 0.25rem;
+    background: var(--surface);
+    border-radius: 4px;
+}
+
+/* Calibration */
+.calibration-note {
+    margin-top: 0.5rem;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    text-align: center;
+    font-style: italic;
+}
+
+/* Stats */
+.stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 1rem;
+}
+
+.stat-item {
+    text-align: center;
+}
+
+.stat-label {
+    display: block;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-bottom: 0.25rem;
+}
+
+.stat-item span:last-child {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--success);
+    font-family: 'Courier New', monospace;
+}
+
+/* Footer */
+.footer {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    text-align: center;
+    margin-top: 2rem;
+}
+
+.studio-branding {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.studio-name {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text);
+}
+
+.studio-tagline {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    font-style: italic;
+}
+
+/* Visualizer Canvas */
+.visualizer-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: -1;
+    opacity: 0.1;
+    pointer-events: none;
+}
+
+/* Animations */
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+.pulsing {
+    animation: pulse 1s infinite;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+}
+
+.shake {
+    animation: shake 0.5s ease-in-out;
+}
+
+/* Responsive Design */
+@media (max-width: 480px) {
+    .app-container {
+        padding: 0;
+    }
+    
+    section {
+        margin: 0.5rem;
+        padding: 1rem;
+    }
+    
+    .data-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .stats {
+        grid-template-columns: 1fr;
+        gap: 0.5rem;
+    }
+}
+
+/* Touch Feedback */
+.btn:active {
+    transform: scale(0.98);
+}
+
+.sensor-toggle:active {
+    transform: scale(0.98);
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+    /* Already dark by default */
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+    :root {
+        --border: #ffffff;
+        --text-muted: #cccccc;
+    }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}

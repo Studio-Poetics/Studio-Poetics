@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Poetics of Sensors</title>
+    <meta name="description" content="Mobile sensor data streaming via OSC/WebSocket">
+    <meta name="theme-color" content="#1a1a2e">
+    
+    <!-- PWA manifest -->
+    <link rel="manifest" href="manifest.json">
+    
+    <!-- iOS PWA support -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Poetics of Sensors">
+    <link rel="apple-touch-icon" href="icons/icon-192x192.png">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32x32.png">
+    
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <h1 class="app-title">Poetics of Sensors</h1>
+            <div class="connection-status" id="connection-status">
+                <span class="status-dot" id="status-dot"></span>
+                <span id="status-text">Disconnected</span>
+            </div>
+        </header>
+
+        <!-- Connection Settings -->
+        <section class="connection-panel">
+            <h2>Connection Settings</h2>
+            <div class="input-group">
+                <label for="server-ip">Server IP:</label>
+                <input type="text" id="server-ip" value="192.168.1.100" placeholder="192.168.1.100">
+            </div>
+            <div class="input-group">
+                <label for="server-port">Port:</label>
+                <input type="number" id="server-port" value="8080" placeholder="8080">
+            </div>
+            <div class="input-group">
+                <label for="send-rate">Send Rate (Hz):</label>
+                <input type="range" id="send-rate" min="1" max="60" value="30">
+                <span id="rate-value">30</span> Hz
+            </div>
+            <div class="input-group">
+                <label class="setting-toggle">
+                    <input type="radio" name="protocol" value="websocket" checked>
+                    <span>WebSocket (JSON)</span>
+                </label>
+                <label class="setting-toggle">
+                    <input type="radio" name="protocol" value="osc-bridge">
+                    <span>OSC Bridge</span>
+                </label>
+            </div>
+            <button id="connect-btn" class="btn primary">Connect</button>
+        </section>
+
+        <!-- Sensor Controls -->
+        <section class="sensor-controls">
+            <h2>Sensor Selection</h2>
+            <div class="sensor-grid">
+                <label class="sensor-toggle">
+                    <input type="checkbox" id="accelerometer" checked>
+                    <span class="sensor-name">Accelerometer</span>
+                    <span class="sensor-status" id="accel-status">Ready</span>
+                </label>
+                <label class="sensor-toggle">
+                    <input type="checkbox" id="gyroscope" checked>
+                    <span class="sensor-name">Gyroscope</span>
+                    <span class="sensor-status" id="gyro-status">Ready</span>
+                </label>
+                <label class="sensor-toggle">
+                    <input type="checkbox" id="orientation" checked>
+                    <span class="sensor-name">Orientation</span>
+                    <span class="sensor-status" id="orient-status">Ready</span>
+                </label>
+                <label class="sensor-toggle">
+                    <input type="checkbox" id="touch" checked>
+                    <span class="sensor-name">Touch</span>
+                    <span class="sensor-status" id="touch-status">Ready</span>
+                </label>
+                <label class="sensor-toggle">
+                    <input type="checkbox" id="location">
+                    <span class="sensor-name">GPS</span>
+                    <span class="sensor-status" id="gps-status">Off</span>
+                </label>
+            </div>
+        </section>
+
+        <!-- Live Data Display -->
+        <section class="data-display">
+            <h2>Live Sensor Data</h2>
+            <div class="data-grid" id="data-grid">
+                <!-- Data cards will be populated by JavaScript -->
+            </div>
+        </section>
+
+        <!-- Calibration -->
+        <section class="calibration">
+            <h2>Calibration</h2>
+            <button id="calibrate-btn" class="btn secondary">Calibrate Sensors</button>
+            <p class="calibration-note">Place device flat and still, then tap calibrate</p>
+        </section>
+
+        <!-- Stats -->
+        <section class="stats">
+            <div class="stat-item">
+                <span class="stat-label">Messages Sent:</span>
+                <span id="message-count">0</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Data Rate:</span>
+                <span id="data-rate">0</span> msg/s
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Connection:</span>
+                <span id="connection-time">00:00</span>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="studio-branding">
+                <span class="studio-name">Studio Poetics</span>
+                <span class="studio-tagline">Motion & Data Poetry</span>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Visualizer Canvas (hidden by default) -->
+    <canvas id="visualizer" class="visualizer-canvas"></canvas>
+
+    <!-- Scripts -->
+    <script src="sensors.js"></script>
+    <script src="network.js"></script>
+    <script src="app.js"></script>
+    
+    <!-- PWA Service Worker -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                    .then(registration => console.log('SW registered'))
+                    .catch(error => console.log('SW registration failed'));
+            });
+        }
+    </script>
+</body>
+</html>
