@@ -3,861 +3,1183 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Studio Poetics - Coming Soon</title>
+    <title>Picture Glicture</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
         
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-        
+
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: #fefefe;
+            background: #FF006E;
+            color: #FFFFFF;
+            line-height: 1.6;
+            padding: 20px;
             min-height: 100vh;
+            position: relative;
             overflow-x: hidden;
-            position: relative;
-            cursor: none; /* Hide default cursor */
         }
         
-        /* Loading Animation */
-        .loading-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: #fefefe;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 10000;
-            transition: opacity 0.8s ease, visibility 0.8s ease;
-        }
-        
-        .loading-screen.hidden {
-            opacity: 0;
-            visibility: hidden;
-        }
-        
-        .loading-logo {
-            font-size: 2rem;
-            font-weight: 200;
-            color: #000;
-            margin-bottom: 30px;
-            opacity: 0;
-            animation: fadeInScale 1.5s ease-out forwards;
-        }
-        
-        .loading-dots {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 20px;
-        }
-        
-        .loading-dot {
-            width: 8px;
-            height: 8px;
-            background: #000;
-            border-radius: 50%;
-            opacity: 0.3;
-            animation: dotPulse 1.4s ease-in-out infinite;
-        }
-        
-        .loading-dot:nth-child(1) { animation-delay: 0s; }
-        .loading-dot:nth-child(2) { animation-delay: 0.2s; }
-        .loading-dot:nth-child(3) { animation-delay: 0.4s; }
-        
-        .loading-text {
-            font-size: 0.8rem;
-            color: #666;
-            letter-spacing: 0.2em;
-            text-transform: uppercase;
-            opacity: 0;
-            animation: fadeIn 1s ease-out 0.5s forwards;
-        }
-        
-        /* Simple Custom Cursor */
-        .cursor {
-            position: fixed;
-            width: 12px;
-            height: 12px;
-            background: #ff7f7f; /* Coral color */
-            border-radius: 50%;
-            pointer-events: none;
-            z-index: 9999;
-            transition: transform 0.1s ease;
-            top: 0;
-            left: 0;
-        }
-        
-        /* Concentric circles on hover - positioned absolutely to prevent layout shift */
-        .cursor.hover::before,
-        .cursor.hover::after {
+        body::before {
             content: '';
-            position: absolute;
-            border-radius: 50%;
-            border: 1px solid #ff7f7f;
-            opacity: 0.6;
-            animation: concentricPulse 1.5s ease-out infinite;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-        }
-        
-        .cursor.hover::before {
-            width: 24px;
-            height: 24px;
-            animation-delay: 0s;
-        }
-        
-        .cursor.hover::after {
-            width: 36px;
-            height: 36px;
-            animation-delay: 0.3s;
-        }
-        
-        /* Additional concentric circles */
-        .cursor .circle-1,
-        .cursor .circle-2,
-        .cursor .circle-3 {
-            position: absolute;
-            border-radius: 50%;
-            border: 1px solid #ff7f7f;
-            opacity: 0;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            transition: opacity 0.2s ease;
-        }
-        
-        .cursor.hover .circle-1,
-        .cursor.hover .circle-2,
-        .cursor.hover .circle-3 {
-            opacity: 0.4;
-            animation: concentricPulse 1.5s ease-out infinite;
-        }
-        
-        .cursor.hover .circle-1 {
-            width: 48px;
-            height: 48px;
-            animation-delay: 0.6s;
-        }
-        
-        .cursor.hover .circle-2 {
-            width: 60px;
-            height: 60px;
-            animation-delay: 0.9s;
-        }
-        
-        .cursor.hover .circle-3 {
-            width: 72px;
-            height: 72px;
-            animation-delay: 1.2s;
-        }
-        
-        /* Geometric Background Elements */
-        .geometric-bg {
             position: fixed;
             top: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 80%, #8338EC 0%, transparent 40%),
+                radial-gradient(circle at 80% 20%, #FFBE0B 0%, transparent 40%),
+                radial-gradient(circle at 40% 40%, #FB5607 0%, transparent 40%);
             pointer-events: none;
-            z-index: 1;
-            overflow: hidden;
+            z-index: -1;
+            mix-blend-mode: multiply;
         }
-        
-        .geo-element {
-            position: absolute;
-            opacity: 0.03;
-        }
-        
-        .geo-circle {
-            border: 1px solid #000;
-            border-radius: 50%;
-            animation: rotate 60s linear infinite;
-        }
-        
-        .geo-circle:nth-child(1) {
-            width: 400px;
-            height: 400px;
-            top: -200px;
-            right: -200px;
-            animation-delay: 0s;
-        }
-        
-        .geo-circle:nth-child(2) {
-            width: 300px;
-            height: 300px;
-            bottom: -150px;
-            left: -150px;
-            animation-delay: -20s;
-            animation-direction: reverse;
-        }
-        
-        .geo-circle:nth-child(3) {
-            width: 200px;
-            height: 200px;
-            top: 20%;
-            left: 10%;
-            animation-delay: -40s;
-        }
-        
-        .geo-line {
-            background: #000;
-            animation: float 45s ease-in-out infinite;
-        }
-        
-        .geo-line:nth-child(4) {
-            width: 300px;
-            height: 1px;
-            top: 15%;
-            right: 20%;
-            transform: rotate(30deg);
-            animation-delay: -10s;
-        }
-        
-        .geo-line:nth-child(5) {
-            width: 200px;
-            height: 1px;
-            bottom: 30%;
-            left: 15%;
-            transform: rotate(-20deg);
-            animation-delay: -25s;
-        }
-        
-        .geo-line:nth-child(6) {
-            width: 150px;
-            height: 1px;
-            top: 60%;
-            right: 10%;
-            transform: rotate(45deg);
-            animation-delay: -35s;
-        }
-        
-        .geo-square {
-            border: 1px solid #000;
-            animation: pulse 40s ease-in-out infinite;
-        }
-        
-        .geo-square:nth-child(7) {
-            width: 60px;
-            height: 60px;
-            top: 25%;
-            right: 25%;
-            transform: rotate(45deg);
-            animation-delay: -15s;
-        }
-        
-        .geo-square:nth-child(8) {
-            width: 40px;
-            height: 40px;
-            bottom: 45%;
-            left: 20%;
-            transform: rotate(30deg);
-            animation-delay: -30s;
-        }
-        
-        .geo-triangle {
-            width: 0;
-            height: 0;
-            animation: drift 50s ease-in-out infinite;
-        }
-        
-        .geo-triangle:nth-child(9) {
-            border-left: 20px solid transparent;
-            border-right: 20px solid transparent;
-            border-bottom: 35px solid #000;
-            top: 40%;
-            right: 40%;
-            animation-delay: -20s;
-        }
-        
-        .geo-triangle:nth-child(10) {
-            border-left: 15px solid transparent;
-            border-right: 15px solid transparent;
-            border-bottom: 25px solid #000;
-            bottom: 20%;
-            left: 40%;
-            transform: rotate(180deg);
-            animation-delay: -45s;
-        }
-        
-        /* Main Container */
+
         .container {
-            position: relative;
-            z-index: 10;
-            min-height: 100vh;
+            max-width: 900px;
+            margin: 0 auto;
             display: flex;
             flex-direction: column;
-            justify-content: center;
             align-items: center;
-            padding: 40px 20px;
-            max-width: 1200px;
-            margin: 0 auto;
-            opacity: 0;
-            animation: fadeInUp 1s ease-out 0.5s forwards;
+            gap: 32px;
+            position: relative;
+            z-index: 1;
         }
-        
-        /* Header */
-        .header {
+
+        h1 {
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            font-weight: 900;
             text-align: center;
-            margin-bottom: 80px;
-        }
-        
-        .logo {
-            position: relative;
-            margin-bottom: 30px;
-        }
-        
-        .logo h1 {
-            font-size: clamp(3rem, 8vw, 5rem);
-            font-weight: 200;
-            color: #000;
+            margin-bottom: 16px;
             letter-spacing: -0.02em;
-            margin-bottom: 20px;
+            color: #FFBE0B;
+            text-shadow: 4px 4px 0px #000000, 8px 8px 0px #8338EC;
             position: relative;
-            cursor: pointer;
+            transform: rotate(-2deg);
         }
         
-        .logo h1::after {
+        h1::after {
             content: '';
             position: absolute;
-            bottom: -15px;
+            bottom: -12px;
             left: 50%;
             transform: translateX(-50%);
             width: 80px;
-            height: 1px;
-            background: #000;
-            opacity: 0.3;
+            height: 6px;
+            background: #FFBE0B;
+            border-radius: 3px;
+            box-shadow: 2px 2px 0px #000000;
         }
-        
-        .tagline {
-            font-size: 0.75rem;
-            color: #666;
-            font-weight: 300;
-            letter-spacing: 0.3em;
-            text-transform: uppercase;
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: #FFFFFF;
+            text-align: center;
+            margin-bottom: 40px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            max-width: 500px;
+            text-shadow: 2px 2px 0px #000000;
+            transform: rotate(1deg);
+        }
+
+        .upload-section {
+            width: 100%;
+            max-width: 450px;
+            text-align: center;
             position: relative;
-            display: inline-block;
-            padding: 0 40px;
         }
         
-        .tagline::before,
-        .tagline::after {
+        .upload-section::before {
+            content: '';
+            position: absolute;
+            top: -20px;
+            left: -20px;
+            right: -20px;
+            bottom: -20px;
+            background: #8338EC;
+            border-radius: 24px;
+            pointer-events: none;
+            transform: rotate(-1deg);
+        }
+
+        .upload-btn {
+            display: inline-block;
+            padding: 20px 48px;
+            background: #FFBE0B;
+            color: #000000;
+            border: 4px solid #000000;
+            border-radius: 0;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: 800;
+            transition: all 0.2s ease;
+            margin-bottom: 24px;
+            box-shadow: 6px 6px 0px #000000;
+            position: relative;
+            overflow: hidden;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transform: rotate(1deg);
+        }
+
+        .upload-btn:hover {
+            transform: rotate(1deg) translate(-2px, -2px);
+            box-shadow: 8px 8px 0px #000000;
+            background: #FFD60A;
+        }
+
+        .upload-btn:active {
+            transform: rotate(1deg) translate(2px, 2px);
+            box-shadow: 2px 2px 0px #000000;
+        }
+
+        #fileInput {
+            display: none;
+        }
+
+        .controls {
+            width: 100%;
+            max-width: 600px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .filter-section {
+            width: 100%;
+            text-align: center;
+        }
+
+        .filter-label {
+            display: block;
+            margin-bottom: 24px;
+            font-weight: 900;
+            color: #FFFFFF;
+            font-size: 1.3rem;
+            text-align: center;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            text-shadow: 3px 3px 0px #000000;
+        }
+
+        .effects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 20px;
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 32px;
+            background: #FB5607;
+            border-radius: 0;
+            border: 6px solid #000000;
+            box-shadow: 12px 12px 0px #000000;
+            transform: rotate(-1deg);
+        }
+
+        .effect-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px;
+            background: #FFFFFF;
+            border: 4px solid #000000;
+            border-radius: 0;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            user-select: none;
+            min-height: 56px;
+            position: relative;
+            color: #000000;
+            font-weight: 600;
+            transform: rotate(0.5deg);
+        }
+
+        .effect-item:nth-child(odd) {
+            transform: rotate(-0.5deg);
+        }
+
+        .effect-item:hover {
+            background: #FFD60A;
+            transform: rotate(0.5deg) translate(-2px, -2px);
+            box-shadow: 6px 6px 0px #000000;
+        }
+
+        .effect-item:nth-child(odd):hover {
+            transform: rotate(-0.5deg) translate(-2px, -2px);
+        }
+
+        .effect-item.selected {
+            background: #8338EC;
+            color: #FFFFFF;
+            font-weight: 700;
+            box-shadow: 4px 4px 0px #000000;
+        }
+
+        .effect-item.selected::before {
+            content: '✓';
+            background: #FFBE0B;
+            color: #000000;
+            border-radius: 0;
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            font-weight: 900;
+            flex-shrink: 0;
+            border: 3px solid #000000;
+            box-shadow: 2px 2px 0px #000000;
+        }
+
+        .effect-item:not(.selected)::before {
+            content: '';
+            border: 3px solid #000000;
+            border-radius: 0;
+            width: 28px;
+            height: 28px;
+            flex-shrink: 0;
+            transition: all 0.2s ease;
+            background: #FFFFFF;
+        }
+
+        .effect-item:hover:not(.selected)::before {
+            background: #FB5607;
+        }
+
+        .effect-name {
+            font-size: 0.95rem;
+            font-weight: 500;
+            letter-spacing: 0.3px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .selected-count {
+            margin-top: 20px;
+            padding: 12px 24px;
+            background: #FFBE0B;
+            border: 4px solid #000000;
+            border-radius: 0;
+            color: #000000;
+            font-weight: 800;
+            display: inline-block;
+            font-size: 1rem;
+            box-shadow: 4px 4px 0px #000000;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transform: rotate(-1deg);
+        }
+
+        .fallback-select {
+            display: none;
+            width: 100%;
+            max-width: 400px;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+            background-color: white;
+            height: 120px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 16px 32px;
+            border: 4px solid #000000;
+            background: #FFFFFF;
+            color: #000000;
+            border-radius: 0;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 700;
+            transition: all 0.2s ease;
+            min-width: 160px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 4px 4px 0px #000000;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn:hover {
+            background: #FFD60A;
+            transform: translate(-2px, -2px);
+            box-shadow: 6px 6px 0px #000000;
+        }
+
+        .btn:active {
+            transform: translate(2px, 2px);
+            box-shadow: 1px 1px 0px #000000;
+        }
+
+        .btn.primary {
+            background: #FB5607;
+            color: #FFFFFF;
+        }
+
+        .btn.primary:hover {
+            background: #FF7F51;
+            color: #FFFFFF;
+        }
+
+        .btn.secondary {
+            background: #8338EC;
+            color: #FFFFFF;
+        }
+
+        .btn.secondary:hover {
+            background: #A663CC;
+            color: #FFFFFF;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: 4px 4px 0px #000000;
+            background: #CCCCCC;
+        }
+
+        .btn.loading {
+            pointer-events: none;
+        }
+
+        .btn.loading::after {
             content: '';
             position: absolute;
             top: 50%;
-            width: 30px;
-            height: 1px;
-            background: #ccc;
-        }
-        
-        .tagline::before { left: 0; }
-        .tagline::after { right: 0; }
-        
-        /* Content */
-        .content {
-            text-align: center;
-            margin-bottom: 80px;
-        }
-        
-        .message {
-            font-size: 1.1rem;
-            color: #333;
-            line-height: 1.8;
-            margin-bottom: 60px;
-            font-weight: 300;
-            max-width: 500px;
-            position: relative;
-        }
-        
-        /* Launch Date Card */
-        .launch-date {
-            background: rgba(255, 255, 255, 0.8);
-            border: 1px solid rgba(0, 0, 0, 0.08);
-            padding: 40px 30px;
-            border-radius: 8px;
-            backdrop-filter: blur(10px);
-            margin-bottom: 60px;
-            max-width: 450px;
-            width: 100%;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .launch-date::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(0, 0, 0, 0.02), transparent);
-            transition: left 0.6s ease;
-        }
-        
-        .launch-date:hover::before {
-            left: 100%;
-        }
-        
-        .launch-date:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
-            border-color: rgba(0, 0, 0, 0.15);
-        }
-        
-        .launch-text {
-            font-size: 0.8rem;
-            color: #666;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            margin-bottom: 20px;
-            font-weight: 400;
-        }
-        
-        .launch-date-main {
-            font-size: 2.2rem;
-            font-weight: 200;
-            color: #000;
-            line-height: 1.2;
-            margin-bottom: 15px;
-            letter-spacing: -0.01em;
-        }
-        
-        .launch-subtitle {
-            font-size: 1rem;
-            color: #666;
-            font-weight: 300;
-            line-height: 1.5;
-        }
-        
-        /* Footer */
-        .footer {
-            text-align: center;
-            position: relative;
-        }
-        
-        .footer::before {
-            content: '';
-            position: absolute;
-            top: -30px;
             left: 50%;
-            transform: translateX(-50%);
-            width: 60px;
-            height: 1px;
-            background: rgba(0, 0, 0, 0.2);
-        }
-        
-        .contact-info {
-            font-size: 0.9rem;
-            color: #666;
-            margin-bottom: 25px;
-            font-weight: 300;
-        }
-        
-        .contact-links {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 30px;
-            flex-wrap: wrap;
-        }
-        
-        .email-link {
-            color: #000;
-            text-decoration: none;
-            font-weight: 300;
-            font-size: 0.9rem;
-            padding: 15px 25px;
-            border: 1px solid rgba(0, 0, 0, 0.1);
-            background: rgba(255, 255, 255, 0.5);
-            transition: all 0.3s ease;
-            letter-spacing: 0.02em;
-            position: relative;
-            overflow: hidden;
-            cursor: pointer;
-            border-radius: 4px;
-        }
-        
-        .email-link::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.02);
-            transition: left 0.3s ease;
-        }
-        
-        .email-link:hover::before {
-            left: 0;
-        }
-        
-        .email-link:hover {
-            transform: translateY(-3px);
-            border-color: rgba(0, 0, 0, 0.2);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-        }
-        
-        .instagram-link {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 50px;
-            height: 50px;
-            border: 1px solid rgba(0, 0, 0, 0.1);
-            background: rgba(255, 255, 255, 0.5);
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-            cursor: pointer;
-            text-decoration: none;
-            border-radius: 4px;
-        }
-        
-        .instagram-link::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.02);
-            transition: left 0.3s ease;
-        }
-        
-        .instagram-link:hover::before {
-            left: 0;
-        }
-        
-        .instagram-link:hover {
-            transform: translateY(-3px);
-            border-color: rgba(0, 0, 0, 0.2);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-        }
-        
-        .instagram-icon {
             width: 20px;
             height: 20px;
-            fill: #000;
-            transition: transform 0.3s ease;
+            margin: -10px 0 0 -10px;
+            border: 3px solid transparent;
+            border-top: 3px solid currentColor;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .canvas-container {
+            width: 100%;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        canvas {
+            max-width: 100%;
+            height: auto;
+            border: 6px solid #000000;
+            border-radius: 0;
+            box-shadow: 8px 8px 0px #000000;
+            transition: all 0.2s ease;
+            background: #FFFFFF;
         }
         
-        .instagram-link:hover .instagram-icon {
-            transform: scale(1.1);
+        canvas:hover {
+            box-shadow: 12px 12px 0px #000000;
+            transform: translate(-2px, -2px);
         }
-        
-        /* Animations */
-        @keyframes fadeInScale {
-            0% {
-                opacity: 0;
-                transform: scale(0.8);
-            }
-            100% {
-                opacity: 1;
-                transform: scale(1);
-            }
+
+        .hidden {
+            display: none;
         }
-        
-        @keyframes dotPulse {
-            0%, 80%, 100% {
-                opacity: 0.3;
-                transform: scale(1);
-            }
-            40% {
-                opacity: 1;
-                transform: scale(1.2);
-            }
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(40px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        
-        @keyframes rotate {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
-        
-        @keyframes float {
-            0%, 100% { 
-                opacity: 0.02; 
-                transform: translateY(0px) rotate(var(--rotation, 0deg)); 
-            }
-            50% { 
-                opacity: 0.06; 
-                transform: translateY(-30px) rotate(calc(var(--rotation, 0deg) + 10deg)); 
-            }
-        }
-        
-        @keyframes pulse {
-            0%, 100% { 
-                opacity: 0.02; 
-                transform: scale(1) rotate(var(--rotation, 0deg)); 
-            }
-            50% { 
-                opacity: 0.08; 
-                transform: scale(1.1) rotate(calc(var(--rotation, 0deg) + 15deg)); 
-            }
-        }
-        
-        @keyframes drift {
-            0%, 100% { 
-                opacity: 0.03; 
-                transform: translateX(0px) translateY(0px) rotate(var(--rotation, 0deg)); 
-            }
-            33% { 
-                opacity: 0.06; 
-                transform: translateX(20px) translateY(-15px) rotate(calc(var(--rotation, 0deg) + 20deg)); 
-            }
-            66% { 
-                opacity: 0.04; 
-                transform: translateX(-15px) translateY(10px) rotate(calc(var(--rotation, 0deg) - 10deg)); 
-            }
-        }
-        
-        @keyframes concentricPulse {
-            0% {
-                transform: translate(-50%, -50%) scale(0);
-                opacity: 0.6;
-            }
-            50% {
-                opacity: 0.3;
-            }
-            100% {
-                transform: translate(-50%, -50%) scale(1);
-                opacity: 0;
-            }
-        }
-        
-        /* Mobile Responsive Design */
+
         @media (max-width: 768px) {
-            .container {
-                padding: 20px 15px;
-            }
-            
-            .header {
-                margin-bottom: 60px;
-            }
-            
-            .content {
-                margin-bottom: 60px;
-            }
-            
-            .launch-date {
-                padding: 30px 20px;
-                margin-bottom: 50px;
-            }
-            
-            .launch-date-main {
-                font-size: 1.8rem;
-            }
-            
-            .contact-links {
-                gap: 20px;
-            }
-            
-            .tagline::before,
-            .tagline::after {
-                width: 20px;
-            }
-            
-            /* Hide cursor on mobile */
-            .cursor {
-                display: none;
-            }
-            
             body {
-                cursor: auto;
+                padding: 10px;
             }
-        }
-        
-        @media (max-width: 480px) {
-            .launch-date {
-                padding: 25px 15px;
-                margin-bottom: 40px;
+
+            h1 {
+                font-size: 2rem;
             }
-            
-            .launch-date-main {
-                font-size: 1.6rem;
-            }
-            
-            .launch-subtitle {
-                font-size: 0.9rem;
-            }
-            
-            .contact-links {
+
+            .button-group {
                 flex-direction: column;
-                gap: 15px;
+                align-items: center;
             }
-            
-            .email-link {
-                padding: 12px 20px;
-                font-size: 0.85rem;
+
+            .btn {
+                width: 100%;
+                max-width: 320px;
+                min-height: 56px;
+                font-size: 1.1rem;
+                padding: 18px 36px;
+                border-width: 3px;
+                box-shadow: 3px 3px 0px #000000;
+            }
+
+            .effects-grid {
+                grid-template-columns: 1fr;
+                gap: 16px;
+                padding: 24px;
+                border-radius: 0;
+                border-width: 4px;
+                box-shadow: 8px 8px 0px #000000;
+            }
+
+            .effect-item {
+                min-height: 60px;
+                padding: 20px;
+                font-size: 1rem;
+                border-radius: 0;
+                border-width: 3px;
+            }
+
+            .upload-btn {
+                min-height: 60px;
+                font-size: 1.2rem;
+                padding: 22px 44px;
+                border-radius: 0;
+                border-width: 3px;
+                box-shadow: 4px 4px 0px #000000;
+            }
+
+            .fallback-select {
+                font-size: 16px;
             }
         }
     </style>
 </head>
 <body>
-    <!-- Loading Screen -->
-    <div class="loading-screen" id="loadingScreen">
-        <div class="loading-logo">Studio Poetics</div>
-        <div class="loading-dots">
-            <div class="loading-dot"></div>
-            <div class="loading-dot"></div>
-            <div class="loading-dot"></div>
-        </div>
-        <div class="loading-text">Crafting Beauty</div>
-    </div>
-    
-    <!-- Simple Custom Cursor -->
-    <div class="cursor" id="cursor">
-        <div class="circle-1"></div>
-        <div class="circle-2"></div>
-        <div class="circle-3"></div>
-    </div>
-    
-    <!-- Geometric Background -->
-    <div class="geometric-bg">
-        <div class="geo-element geo-circle"></div>
-        <div class="geo-element geo-circle"></div>
-        <div class="geo-element geo-circle"></div>
-        <div class="geo-element geo-line"></div>
-        <div class="geo-element geo-line"></div>
-        <div class="geo-element geo-line"></div>
-        <div class="geo-element geo-square"></div>
-        <div class="geo-element geo-square"></div>
-        <div class="geo-element geo-triangle"></div>
-        <div class="geo-element geo-triangle"></div>
-    </div>
-    
     <div class="container">
-        <!-- Header -->
-        <header class="header">
-            <div class="logo">
-                <h1>Studio Poetics</h1>
-                <div class="tagline">Coming Soon</div>
-            </div>
-        </header>
+        <h1>Picture Glicture</h1>
+        <p class="subtitle">Transform everyday objects into surreal digital twins</p>
         
-        <!-- Content -->
-        <main class="content">
-            <p class="message">
-                We're crafting something beautiful and meaningful.<br>
-                Our creative studio will be live soon.
-            </p>
+        <div class="upload-section">
+            <label for="fileInput" class="upload-btn">Choose Image</label>
+            <input type="file" id="fileInput" accept="image/*">
+        </div>
+
+        <div class="controls hidden" id="controls">
+            <div class="filter-section">
+                <label class="filter-label">Select Glitch Effects</label>
+                <div class="effects-grid" id="effectsGrid">
+                    <div class="effect-item" data-effect="pixelSort">
+                        <span class="effect-name">Pixel Sorting</span>
+                    </div>
+                    <div class="effect-item" data-effect="datamosh">
+                        <span class="effect-name">Datamosh Frame Blending</span>
+                    </div>
+                    <div class="effect-item" data-effect="vhsStatic">
+                        <span class="effect-name">VHS Static/Scanlines</span>
+                    </div>
+                    <div class="effect-item" data-effect="chromatic">
+                        <span class="effect-name">RGB Channel Shift</span>
+                    </div>
+                    <div class="effect-item" data-effect="ascii">
+                        <span class="effect-name">ASCII Art Overlay</span>
+                    </div>
+                    <div class="effect-item" data-effect="posterize">
+                        <span class="effect-name">Posterization</span>
+                    </div>
+                    <div class="effect-item" data-effect="noise">
+                        <span class="effect-name">Noise/Grain Injection</span>
+                    </div>
+                    <div class="effect-item" data-effect="pixelate">
+                        <span class="effect-name">Block Pixelation</span>
+                    </div>
+                    <div class="effect-item" data-effect="invert">
+                        <span class="effect-name">Color Inversion</span>
+                    </div>
+                    <div class="effect-item" data-effect="solarize">
+                        <span class="effect-name">Solarize Effect</span>
+                    </div>
+                    <div class="effect-item" data-effect="edges">
+                        <span class="effect-name">Edge Detection</span>
+                    </div>
+                    <div class="effect-item" data-effect="wave">
+                        <span class="effect-name">Wave Distortion</span>
+                    </div>
+                    <div class="effect-item" data-effect="kaleidoscope">
+                        <span class="effect-name">Kaleidoscope Mirror</span>
+                    </div>
+                    <div class="effect-item" data-effect="colorCycle">
+                        <span class="effect-name">Color Cycling</span>
+                    </div>
+                    <div class="effect-item" data-effect="scanlineOffset">
+                        <span class="effect-name">Scanline Offset</span>
+                    </div>
+                </div>
+                <div class="selected-count" id="selectedCount">0 effects selected</div>
+                
+                <!-- Fallback select for accessibility -->
+                <select id="filterSelect" multiple class="fallback-select">
+                    <option value="pixelSort">Pixel Sorting</option>
+                    <option value="datamosh">Datamosh Frame Blending</option>
+                    <option value="vhsStatic">VHS Static/Scanlines</option>
+                    <option value="chromatic">RGB Channel Shift</option>
+                    <option value="ascii">ASCII Art Overlay</option>
+                    <option value="posterize">Posterization</option>
+                    <option value="noise">Noise/Grain Injection</option>
+                    <option value="pixelate">Block Pixelation</option>
+                    <option value="invert">Color Inversion</option>
+                    <option value="solarize">Solarize Effect</option>
+                    <option value="edges">Edge Detection</option>
+                    <option value="wave">Wave Distortion</option>
+                    <option value="kaleidoscope">Kaleidoscope Mirror</option>
+                    <option value="colorCycle">Color Cycling</option>
+                    <option value="scanlineOffset">Scanline Offset</option>
+                </select>
+            </div>
             
-            <!-- Launch Date Card -->
-            <div class="launch-date">
-                <div class="launch-text">Mark Your Calendar</div>
-                <div class="launch-date-main">15th June 2025</div>
-                <div class="launch-subtitle">The new site will be live</div>
+            <div class="button-group">
+                <button class="btn secondary" id="applyBtn" disabled>
+                    <span class="btn-text">Apply Effects</span>
+                </button>
+                <button class="btn" id="randomizeBtn">
+                    <span class="btn-text">🎲 Randomize</span>
+                </button>
+                <button class="btn" id="resetBtn">
+                    <span class="btn-text">↺ Reset</span>
+                </button>
+                <button class="btn primary" id="downloadBtn">
+                    <span class="btn-text">⬇ Download</span>
+                </button>
             </div>
-        </main>
-        
-        <!-- Footer -->
-        <footer class="footer">
-            <div class="contact-info">
-                Questions? Reach out to us
-            </div>
-            <div class="contact-links">
-                <a href="mailto:pranshu@poetics.studio" class="email-link">
-                    pranshu@poetics.studio
-                </a>
-                <a href="https://instagram.com/studio.poetics" target="_blank" rel="noopener noreferrer" class="instagram-link">
-                    <svg class="instagram-icon" viewBox="0 0 24 24">
-                        <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
-                    </svg>
-                </a>
-            </div>
-        </footer>
+        </div>
+
+        <div class="canvas-container">
+            <canvas id="canvas"></canvas>
+        </div>
     </div>
 
     <script>
-        // Loading Animation
-        window.addEventListener('load', function() {
-            setTimeout(function() {
-                document.getElementById('loadingScreen').classList.add('hidden');
-            }, 2000);
-        });
-        
-        // Simple Smooth Cursor with Concentric Circles on Hover
-        (function() {
-            const cursor = document.getElementById('cursor');
-            let mouseX = 0;
-            let mouseY = 0;
-            let cursorX = 0;
-            let cursorY = 0;
-            
-            // Only run cursor on desktop
-            if (window.innerWidth > 768) {
-                // Track mouse movement
-                document.addEventListener('mousemove', function(e) {
-                    mouseX = e.clientX;
-                    mouseY = e.clientY;
-                });
+        class PictureGlicture {
+            constructor() {
+                this.canvas = document.getElementById('canvas');
+                this.ctx = this.canvas.getContext('2d');
+                this.originalImageData = null;
+                this.currentImageData = null;
+                this.originalImage = null;
+                this.selectedEffects = new Set();
                 
-                // Smooth cursor animation
-                function animateCursor() {
-                    // Smooth easing
-                    const ease = 0.15;
-                    const dx = mouseX - cursorX;
-                    const dy = mouseY - cursorY;
-                    
-                    cursorX += dx * ease;
-                    cursorY += dy * ease;
-                    
-                    cursor.style.transform = `translate(${cursorX - 6}px, ${cursorY - 6}px)`;
-                    
-                    requestAnimationFrame(animateCursor);
-                }
+                this.initEventListeners();
+                this.updateSelectedCount();
+            }
+
+            initEventListeners() {
+                document.getElementById('fileInput').addEventListener('change', this.handleFileUpload.bind(this));
+                document.getElementById('applyBtn').addEventListener('click', this.applySelectedEffects.bind(this));
+                document.getElementById('randomizeBtn').addEventListener('click', this.randomizeEffects.bind(this));
+                document.getElementById('resetBtn').addEventListener('click', this.resetImage.bind(this));
+                document.getElementById('downloadBtn').addEventListener('click', this.downloadImage.bind(this));
                 
-                // Start animation
-                animateCursor();
-                
-                // Add hover effect to interactive elements
-                const hoverElements = document.querySelectorAll('h1, .launch-date, .email-link, .instagram-link');
-                
-                hoverElements.forEach(function(element) {
-                    element.addEventListener('mouseenter', function() {
-                        cursor.classList.add('hover');
-                    });
-                    
-                    element.addEventListener('mouseleave', function() {
-                        cursor.classList.remove('hover');
-                    });
-                });
-                
-                // Hide cursor when leaving window
-                document.addEventListener('mouseleave', function() {
-                    cursor.style.opacity = '0';
-                });
-                
-                document.addEventListener('mouseenter', function() {
-                    cursor.style.opacity = '1';
+                // Add effect selection listeners
+                document.querySelectorAll('.effect-item').forEach(item => {
+                    item.addEventListener('click', this.toggleEffect.bind(this));
                 });
             }
-        })();
+
+            toggleEffect(event) {
+                const effectItem = event.currentTarget;
+                const effectName = effectItem.dataset.effect;
+                
+                if (this.selectedEffects.has(effectName)) {
+                    this.selectedEffects.delete(effectName);
+                    effectItem.classList.remove('selected');
+                } else {
+                    this.selectedEffects.add(effectName);
+                    effectItem.classList.add('selected');
+                }
+                
+                this.updateSelectedCount();
+                this.updateApplyButton();
+                this.syncFallbackSelect();
+            }
+
+            updateSelectedCount() {
+                const count = this.selectedEffects.size;
+                const countElement = document.getElementById('selectedCount');
+                countElement.textContent = `${count} effect${count !== 1 ? 's' : ''} selected`;
+                countElement.style.display = count > 0 ? 'inline-block' : 'none';
+            }
+
+            updateApplyButton() {
+                const applyBtn = document.getElementById('applyBtn');
+                applyBtn.disabled = this.selectedEffects.size === 0 || !this.originalImageData;
+            }
+
+            syncFallbackSelect() {
+                const select = document.getElementById('filterSelect');
+                Array.from(select.options).forEach(option => {
+                    option.selected = this.selectedEffects.has(option.value);
+                });
+            }
+
+            setButtonLoading(buttonId, loading) {
+                const btn = document.getElementById(buttonId);
+                const btnText = btn.querySelector('.btn-text');
+                
+                if (loading) {
+                    btn.classList.add('loading');
+                    btn.disabled = true;
+                    if (btnText) btnText.style.opacity = '0';
+                } else {
+                    btn.classList.remove('loading');
+                    btn.disabled = false;
+                    if (btnText) btnText.style.opacity = '1';
+                }
+            }
+
+            handleFileUpload(event) {
+                const file = event.target.files[0];
+                if (file && file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        this.loadImage(e.target.result);
+                    };
+                    reader.readAsDataURL(file);
+                }
+            }
+
+            loadImage(src) {
+                this.originalImage = new Image();
+                this.originalImage.onload = () => {
+                    this.setupCanvas();
+                    this.drawOriginalImage();
+                    this.storeOriginalImageData();
+                    document.getElementById('controls').classList.remove('hidden');
+                    this.updateApplyButton();
+                };
+                this.originalImage.src = src;
+            }
+
+            setupCanvas() {
+                const maxWidth = Math.min(800, window.innerWidth - 40);
+                const aspectRatio = this.originalImage.height / this.originalImage.width;
+                
+                this.canvas.width = Math.min(this.originalImage.width, maxWidth);
+                this.canvas.height = this.canvas.width * aspectRatio;
+                
+                this.canvas.style.maxWidth = '100%';
+            }
+
+            drawOriginalImage() {
+                this.ctx.drawImage(this.originalImage, 0, 0, this.canvas.width, this.canvas.height);
+            }
+
+            storeOriginalImageData() {
+                this.originalImageData = this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height);
+                this.currentImageData = this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height);
+            }
+
+            async applySelectedEffects() {
+                if (this.selectedEffects.size === 0) {
+                    alert('Please select at least one effect');
+                    return;
+                }
+
+                this.setButtonLoading('applyBtn', true);
+                this.resetImage();
+                
+                const effectNames = Array.from(this.selectedEffects);
+                
+                for (const effectName of effectNames) {
+                    await new Promise(resolve => {
+                        setTimeout(() => {
+                            this.applyEffect(effectName);
+                            resolve();
+                        }, 50);
+                    });
+                }
+                
+                this.setButtonLoading('applyBtn', false);
+            }
+
+            applyEffect(effectName) {
+                const imageData = this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height);
+                let newImageData;
+
+                switch (effectName) {
+                    case 'pixelSort':
+                        newImageData = this.pixelSort(imageData);
+                        break;
+                    case 'datamosh':
+                        newImageData = this.datamosh(imageData);
+                        break;
+                    case 'vhsStatic':
+                        newImageData = this.vhsStatic(imageData);
+                        break;
+                    case 'chromatic':
+                        newImageData = this.chromaticAberration(imageData);
+                        break;
+                    case 'ascii':
+                        newImageData = this.asciiOverlay(imageData);
+                        break;
+                    case 'posterize':
+                        newImageData = this.posterize(imageData);
+                        break;
+                    case 'noise':
+                        newImageData = this.addNoise(imageData);
+                        break;
+                    case 'pixelate':
+                        newImageData = this.pixelate(imageData);
+                        break;
+                    case 'invert':
+                        newImageData = this.invert(imageData);
+                        break;
+                    case 'solarize':
+                        newImageData = this.solarize(imageData);
+                        break;
+                    case 'edges':
+                        newImageData = this.edgeDetection(imageData);
+                        break;
+                    case 'wave':
+                        newImageData = this.waveDistortion(imageData);
+                        break;
+                    case 'kaleidoscope':
+                        newImageData = this.kaleidoscope(imageData);
+                        break;
+                    case 'colorCycle':
+                        newImageData = this.colorCycle(imageData);
+                        break;
+                    case 'scanlineOffset':
+                        newImageData = this.scanlineOffset(imageData);
+                        break;
+                    default:
+                        return;
+                }
+
+                if (newImageData) {
+                    this.ctx.putImageData(newImageData, 0, 0);
+                }
+            }
+
+            pixelSort(imageData) {
+                const data = new Uint8ClampedArray(imageData.data);
+                const width = imageData.width;
+                const height = imageData.height;
+
+                for (let y = 0; y < height; y += 4) {
+                    const row = [];
+                    for (let x = 0; x < width; x++) {
+                        const i = (y * width + x) * 4;
+                        const brightness = (data[i] + data[i + 1] + data[i + 2]) / 3;
+                        row.push({ x, brightness, r: data[i], g: data[i + 1], b: data[i + 2], a: data[i + 3] });
+                    }
+
+                    row.sort((a, b) => a.brightness - b.brightness);
+
+                    for (let x = 0; x < width; x++) {
+                        const i = (y * width + x) * 4;
+                        const pixel = row[x];
+                        data[i] = pixel.r;
+                        data[i + 1] = pixel.g;
+                        data[i + 2] = pixel.b;
+                        data[i + 3] = pixel.a;
+                    }
+                }
+
+                return new ImageData(data, width, height);
+            }
+
+            datamosh(imageData) {
+                const data = new Uint8ClampedArray(imageData.data);
+                const width = imageData.width;
+                const height = imageData.height;
+
+                for (let i = 0; i < data.length; i += 4) {
+                    const offset = Math.floor(Math.random() * 200 - 100) * 4;
+                    const sourceIndex = Math.max(0, Math.min(data.length - 4, i + offset));
+                    
+                    if (Math.random() < 0.3) {
+                        data[i] = data[sourceIndex];
+                        data[i + 1] = data[sourceIndex + 1];
+                        data[i + 2] = data[sourceIndex + 2];
+                    }
+                }
+
+                return new ImageData(data, width, height);
+            }
+
+            vhsStatic(imageData) {
+                const data = new Uint8ClampedArray(imageData.data);
+                const width = imageData.width;
+                const height = imageData.height;
+
+                for (let y = 0; y < height; y++) {
+                    if (y % 3 === 0) {
+                        for (let x = 0; x < width; x++) {
+                            const i = (y * width + x) * 4;
+                            data[i] = Math.max(0, data[i] - 30);
+                            data[i + 1] = Math.max(0, data[i + 1] - 30);
+                            data[i + 2] = Math.max(0, data[i + 2] - 30);
+                        }
+                    }
+
+                    if (Math.random() < 0.1) {
+                        for (let x = 0; x < width; x++) {
+                            const i = (y * width + x) * 4;
+                            const noise = Math.random() * 100;
+                            data[i] = Math.min(255, data[i] + noise);
+                            data[i + 1] = Math.min(255, data[i + 1] + noise);
+                            data[i + 2] = Math.min(255, data[i + 2] + noise);
+                        }
+                    }
+                }
+
+                return new ImageData(data, width, height);
+            }
+
+            chromaticAberration(imageData) {
+                const data = new Uint8ClampedArray(imageData.data);
+                const originalData = new Uint8ClampedArray(imageData.data);
+                const width = imageData.width;
+                const height = imageData.height;
+                const shift = 5;
+
+                for (let y = 0; y < height; y++) {
+                    for (let x = 0; x < width; x++) {
+                        const i = (y * width + x) * 4;
+                        
+                        const rIndex = (y * width + Math.max(0, x - shift)) * 4;
+                        const bIndex = (y * width + Math.min(width - 1, x + shift)) * 4;
+                        
+                        data[i] = originalData[rIndex];
+                        data[i + 1] = originalData[i + 1];
+                        data[i + 2] = originalData[bIndex + 2];
+                        data[i + 3] = originalData[i + 3];
+                    }
+                }
+
+                return new ImageData(data, width, height);
+            }
+
+            asciiOverlay(imageData) {
+                const data = new Uint8ClampedArray(imageData.data);
+                const width = imageData.width;
+                const height = imageData.height;
+
+                this.ctx.putImageData(new ImageData(data, width, height), 0, 0);
+                
+                this.ctx.fillStyle = 'rgba(0, 255, 0, 0.7)';
+                this.ctx.font = '12px monospace';
+                
+                const chars = '@%#*+=-:. ';
+                
+                for (let y = 10; y < height; y += 15) {
+                    for (let x = 0; x < width; x += 8) {
+                        const i = (y * width + x) * 4;
+                        const brightness = (data[i] + data[i + 1] + data[i + 2]) / 3;
+                        const charIndex = Math.floor((brightness / 255) * (chars.length - 1));
+                        this.ctx.fillText(chars[charIndex], x, y);
+                    }
+                }
+
+                return this.ctx.getImageData(0, 0, width, height);
+            }
+
+            posterize(imageData) {
+                const data = new Uint8ClampedArray(imageData.data);
+                const levels = 8;
+                const step = 255 / (levels - 1);
+
+                for (let i = 0; i < data.length; i += 4) {
+                    data[i] = Math.round(data[i] / step) * step;
+                    data[i + 1] = Math.round(data[i + 1] / step) * step;
+                    data[i + 2] = Math.round(data[i + 2] / step) * step;
+                }
+
+                return new ImageData(data, imageData.width, imageData.height);
+            }
+
+            addNoise(imageData) {
+                const data = new Uint8ClampedArray(imageData.data);
+
+                for (let i = 0; i < data.length; i += 4) {
+                    if (Math.random() < 0.1) {
+                        const noise = (Math.random() - 0.5) * 100;
+                        data[i] = Math.max(0, Math.min(255, data[i] + noise));
+                        data[i + 1] = Math.max(0, Math.min(255, data[i + 1] + noise));
+                        data[i + 2] = Math.max(0, Math.min(255, data[i + 2] + noise));
+                    }
+                }
+
+                return new ImageData(data, imageData.width, imageData.height);
+            }
+
+            pixelate(imageData) {
+                const data = new Uint8ClampedArray(imageData.data);
+                const width = imageData.width;
+                const height = imageData.height;
+                const blockSize = 8;
+
+                for (let y = 0; y < height; y += blockSize) {
+                    for (let x = 0; x < width; x += blockSize) {
+                        let avgR = 0, avgG = 0, avgB = 0, count = 0;
+                        
+                        for (let dy = 0; dy < blockSize && y + dy < height; dy++) {
+                            for (let dx = 0; dx < blockSize && x + dx < width; dx++) {
+                                const i = ((y + dy) * width + (x + dx)) * 4;
+                                avgR += data[i];
+                                avgG += data[i + 1];
+                                avgB += data[i + 2];
+                                count++;
+                            }
+                        }
+                        
+                        avgR /= count;
+                        avgG /= count;
+                        avgB /= count;
+                        
+                        for (let dy = 0; dy < blockSize && y + dy < height; dy++) {
+                            for (let dx = 0; dx < blockSize && x + dx < width; dx++) {
+                                const i = ((y + dy) * width + (x + dx)) * 4;
+                                data[i] = avgR;
+                                data[i + 1] = avgG;
+                                data[i + 2] = avgB;
+                            }
+                        }
+                    }
+                }
+
+                return new ImageData(data, width, height);
+            }
+
+            invert(imageData) {
+                const data = new Uint8ClampedArray(imageData.data);
+
+                for (let i = 0; i < data.length; i += 4) {
+                    data[i] = 255 - data[i];
+                    data[i + 1] = 255 - data[i + 1];
+                    data[i + 2] = 255 - data[i + 2];
+                }
+
+                return new ImageData(data, imageData.width, imageData.height);
+            }
+
+            solarize(imageData) {
+                const data = new Uint8ClampedArray(imageData.data);
+                const threshold = 128;
+
+                for (let i = 0; i < data.length; i += 4) {
+                    data[i] = data[i] < threshold ? data[i] : 255 - data[i];
+                    data[i + 1] = data[i + 1] < threshold ? data[i + 1] : 255 - data[i + 1];
+                    data[i + 2] = data[i + 2] < threshold ? data[i + 2] : 255 - data[i + 2];
+                }
+
+                return new ImageData(data, imageData.width, imageData.height);
+            }
+
+            edgeDetection(imageData) {
+                const data = new Uint8ClampedArray(imageData.data);
+                const width = imageData.width;
+                const height = imageData.height;
+                const sobelX = [[-1, 0, 1], [-2, 0, 2], [-1, 0, 1]];
+                const sobelY = [[-1, -2, -1], [0, 0, 0], [1, 2, 1]];
+
+                for (let y = 1; y < height - 1; y++) {
+                    for (let x = 1; x < width - 1; x++) {
+                        let gx = 0, gy = 0;
+                        
+                        for (let ky = -1; ky <= 1; ky++) {
+                            for (let kx = -1; kx <= 1; kx++) {
+                                const i = ((y + ky) * width + (x + kx)) * 4;
+                                const gray = (data[i] + data[i + 1] + data[i + 2]) / 3;
+                                gx += gray * sobelX[ky + 1][kx + 1];
+                                gy += gray * sobelY[ky + 1][kx + 1];
+                            }
+                        }
+                        
+                        const magnitude = Math.sqrt(gx * gx + gy * gy);
+                        const i = (y * width + x) * 4;
+                        data[i] = magnitude;
+                        data[i + 1] = magnitude;
+                        data[i + 2] = magnitude;
+                    }
+                }
+
+                return new ImageData(data, width, height);
+            }
+
+            waveDistortion(imageData) {
+                const data = new Uint8ClampedArray(imageData.data);
+                const originalData = new Uint8ClampedArray(imageData.data);
+                const width = imageData.width;
+                const height = imageData.height;
+
+                for (let y = 0; y < height; y++) {
+                    for (let x = 0; x < width; x++) {
+                        const distortion = Math.sin(y * 0.1) * 10;
+                        const sourceX = Math.max(0, Math.min(width - 1, x + distortion));
+                        const sourceY = y;
+                        
+                        const i = (y * width + x) * 4;
+                        const si = (sourceY * width + Math.floor(sourceX)) * 4;
+                        
+                        data[i] = originalData[si];
+                        data[i + 1] = originalData[si + 1];
+                        data[i + 2] = originalData[si + 2];
+                        data[i + 3] = originalData[si + 3];
+                    }
+                }
+
+                return new ImageData(data, width, height);
+            }
+
+            kaleidoscope(imageData) {
+                const data = new Uint8ClampedArray(imageData.data);
+                const originalData = new Uint8ClampedArray(imageData.data);
+                const width = imageData.width;
+                const height = imageData.height;
+                const centerX = width / 2;
+                const centerY = height / 2;
+
+                for (let y = 0; y < height; y++) {
+                    for (let x = 0; x < width; x++) {
+                        const dx = x - centerX;
+                        const dy = y - centerY;
+                        const angle = Math.atan2(dy, dx);
+                        const radius = Math.sqrt(dx * dx + dy * dy);
+                        
+                        const mirroredAngle = Math.abs(angle) % (Math.PI / 3);
+                        const sourceX = Math.floor(centerX + radius * Math.cos(mirroredAngle));
+                        const sourceY = Math.floor(centerY + radius * Math.sin(mirroredAngle));
+                        
+                        if (sourceX >= 0 && sourceX < width && sourceY >= 0 && sourceY < height) {
+                            const i = (y * width + x) * 4;
+                            const si = (sourceY * width + sourceX) * 4;
+                            
+                            data[i] = originalData[si];
+                            data[i + 1] = originalData[si + 1];
+                            data[i + 2] = originalData[si + 2];
+                            data[i + 3] = originalData[si + 3];
+                        }
+                    }
+                }
+
+                return new ImageData(data, width, height);
+            }
+
+            colorCycle(imageData) {
+                const data = new Uint8ClampedArray(imageData.data);
+                const time = Date.now() * 0.01;
+
+                for (let i = 0; i < data.length; i += 4) {
+                    const hue = (time + i * 0.01) % 360;
+                    const rgb = this.hslToRgb(hue / 360, 0.8, 0.5);
+                    
+                    data[i] = (data[i] + rgb[0]) / 2;
+                    data[i + 1] = (data[i + 1] + rgb[1]) / 2;
+                    data[i + 2] = (data[i + 2] + rgb[2]) / 2;
+                }
+
+                return new ImageData(data, imageData.width, imageData.height);
+            }
+
+            scanlineOffset(imageData) {
+                const data = new Uint8ClampedArray(imageData.data);
+                const originalData = new Uint8ClampedArray(imageData.data);
+                const width = imageData.width;
+                const height = imageData.height;
+
+                for (let y = 0; y < height; y++) {
+                    if (y % 10 === 0) {
+                        const offset = Math.floor(Math.random() * 20 - 10);
+                        for (let x = 0; x < width; x++) {
+                            const sourceX = Math.max(0, Math.min(width - 1, x + offset));
+                            const i = (y * width + x) * 4;
+                            const si = (y * width + sourceX) * 4;
+                            
+                            data[i] = originalData[si];
+                            data[i + 1] = originalData[si + 1];
+                            data[i + 2] = originalData[si + 2];
+                            data[i + 3] = originalData[si + 3];
+                        }
+                    }
+                }
+
+                return new ImageData(data, width, height);
+            }
+
+            hslToRgb(h, s, l) {
+                const c = (1 - Math.abs(2 * l - 1)) * s;
+                const x = c * (1 - Math.abs((h * 6) % 2 - 1));
+                const m = l - c / 2;
+                let r, g, b;
+
+                if (h < 1/6) [r, g, b] = [c, x, 0];
+                else if (h < 2/6) [r, g, b] = [x, c, 0];
+                else if (h < 3/6) [r, g, b] = [0, c, x];
+                else if (h < 4/6) [r, g, b] = [0, x, c];
+                else if (h < 5/6) [r, g, b] = [x, 0, c];
+                else [r, g, b] = [c, 0, x];
+
+                return [(r + m) * 255, (g + m) * 255, (b + m) * 255];
+            }
+
+            randomizeEffects() {
+                const allEffects = ['pixelSort', 'datamosh', 'vhsStatic', 'chromatic', 'ascii', 
+                                 'posterize', 'noise', 'pixelate', 'invert', 'solarize', 
+                                 'edges', 'wave', 'kaleidoscope', 'colorCycle', 'scanlineOffset'];
+                
+                const numEffects = Math.floor(Math.random() * 4) + 1;
+                const randomEffects = [];
+                
+                for (let i = 0; i < numEffects; i++) {
+                    const randomEffect = allEffects[Math.floor(Math.random() * allEffects.length)];
+                    if (!randomEffects.includes(randomEffect)) {
+                        randomEffects.push(randomEffect);
+                    }
+                }
+
+                // Clear current selection
+                this.selectedEffects.clear();
+                document.querySelectorAll('.effect-item').forEach(item => {
+                    item.classList.remove('selected');
+                });
+                
+                // Select random effects
+                randomEffects.forEach(effectName => {
+                    this.selectedEffects.add(effectName);
+                    const effectItem = document.querySelector(`[data-effect="${effectName}"]`);
+                    if (effectItem) effectItem.classList.add('selected');
+                });
+                
+                this.updateSelectedCount();
+                this.updateApplyButton();
+                this.syncFallbackSelect();
+                
+                if (this.originalImageData) {
+                    this.applySelectedEffects();
+                }
+            }
+
+            resetImage() {
+                if (this.originalImageData) {
+                    this.ctx.putImageData(this.originalImageData, 0, 0);
+                }
+            }
+
+            downloadImage() {
+                const link = document.createElement('a');
+                link.download = 'picture-glictured.png';
+                link.href = this.canvas.toDataURL();
+                link.click();
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            new PictureGlicture();
+        });
     </script>
 </body>
 </html>
