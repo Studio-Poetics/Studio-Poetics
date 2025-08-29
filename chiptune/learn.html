@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChipTracker Academy - Learn the Ways of the Chiptune</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(45deg, #000428 0%, #004e92 100%);
+            color: #00ff41;
+            min-height: 100vh;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        .title {
+            font-size: 48px;
+            font-weight: bold;
+            text-shadow: 0 0 20px #00ff41;
+            letter-spacing: 5px;
+            margin-bottom: 10px;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from { text-shadow: 0 0 20px #00ff41; }
+            to { text-shadow: 0 0 30px #00ff41, 0 0 40px #00ff41; }
+        }
+
+        .subtitle {
+            font-size: 18px;
+            color: #ff6b35;
+            text-shadow: 0 0 10px #ff6b35;
+        }
+
+        .back-btn {
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: linear-gradient(45deg, #1a1a1a, #333);
+            border: 1px solid #00ff41;
+            color: #00ff41;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-family: inherit;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+
+        .back-btn:hover {
+            background: linear-gradient(45deg, #333, #555);
+            box-shadow: 0 0 10px rgba(0, 255, 65, 0.7);
+            transform: translateY(-1px);
+        }
+
+        .section {
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid #00ff41;
+            margin-bottom: 30px;
+            padding: 25px;
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.3);
+        }
+
+        .section h2 {
+            color: #ff6b35;
+            font-size: 24px;
+            margin-bottom: 15px;
+            text-shadow: 0 0 10px #ff6b35;
+            border-bottom: 1px solid #ff6b35;
+            padding-bottom: 5px;
+        }
+
+        .section h3 {
+            color: #ffff00;
+            font-size: 18px;
+            margin: 20px 0 10px 0;
+            text-shadow: 0 0 5px #ffff00;
+        }
+
+        .code-block {
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid #666;
+            padding: 15px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            overflow-x: auto;
+        }
+
+        .ascii-art {
+            color: #00ff41;
+            font-size: 12px;
+            line-height: 1;
+            text-align: center;
+            margin: 20px 0;
+            white-space: pre;
+        }
+
+        .meme-reference {
+            background: rgba(255, 107, 53, 0.1);
+            border: 1px solid #ff6b35;
+            padding: 10px;
+            margin: 10px 0;
+            font-style: italic;
+            color: #ff6b35;
+        }
+
+        .key-combo {
+            background: rgba(0, 255, 65, 0.2);
+            border: 1px solid #00ff41;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-weight: bold;
+        }
+
+        .warning {
+            background: rgba(255, 0, 0, 0.2);
+            border: 1px solid #ff0000;
+            padding: 10px;
+            margin: 10px 0;
+            color: #ff6666;
+        }
+
+        .tip {
+            background: rgba(255, 255, 0, 0.2);
+            border: 1px solid #ffff00;
+            padding: 10px;
+            margin: 10px 0;
+            color: #ffff88;
+        }
+
+        ul, ol {
+            margin-left: 20px;
+            margin-bottom: 15px;
+        }
+
+        li {
+            margin-bottom: 5px;
+        }
+
+        .pattern-example {
+            font-family: monospace;
+            font-size: 12px;
+            line-height: 1.2;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 10px;
+            border: 1px solid #00ff41;
+            margin: 10px 0;
+            white-space: pre;
+        }
+
+        .scrolling-text {
+            animation: scroll 20s linear infinite;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+
+        @keyframes scroll {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
+        }
+
+        .blink {
+            animation: blink 1s step-end infinite;
+        }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+
+        .rainbow {
+            background: linear-gradient(45deg, #ff0000, #ff8000, #ffff00, #00ff00, #0080ff, #8000ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <a href="index.html" class="back-btn">← TRACKER</a>
+            <h1 class="title">CHIPTRACKER ACADEMY</h1>
+            <p class="subtitle">Learn the Ancient Arts of Chiptune Mastery</p>
+        </div>
+
+        <div class="section">
+            <div class="ascii-art">
+    ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+    ░  ██████╗██╗  ██╗██╗██████╗ ████████╗░
+    ░ ██╔════╝██║  ██║██║██╔══██╗╚══██╔══╝░
+    ░ ██║     ███████║██║██████╔╝   ██║   ░
+    ░ ██║     ██╔══██║██║██╔═══╝    ██║   ░
+    ░ ╚██████╗██║  ██║██║██║        ██║   ░
+    ░  ╚═════╝╚═╝  ╚═╝╚═╝╚═╝        ╚═╝   ░
+    ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+            </div>
+            <h2>Welcome to the Underground</h2>
+            <p>Greetings, aspiring chiphead! You've stumbled into the mystical realm of tracker music - a sacred art form born in the basement dwellings of demo scene hackers circa 1987. This isn't your grandmother's music software; this is <strong>HARDCORE TRACKING ACTION</strong>.</p>
+            
+            <div class="meme-reference">
+                "Sir, this is a Wendy's..." - No wait, this is a TRACKER. Prepare for maximum chiptune energy!
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Chapter 1: The Sacred Interface</h2>
+            <h3>Understanding the Matrix</h3>
+            <p>The tracker interface is like The Matrix, but with more bleeps and bloops. Each row represents a moment in time, and each column is a channel. Think of it as musical spreadsheet <span class="blink">— BUT COOLER</span>.</p>
+
+            <div class="pattern-example">Row | CH1    CH2    CH3    CH4
+----+------------------------
+00  | C-4 01 50 ---  ---  ---
+01  | ---  ---  C-3 02 60 ---
+02  | E-4 01 40 ---  ---  ---
+03  | ---  ---  ---  G-4 03 70</div>
+
+            <div class="tip">
+                <strong>Pro Tip:</strong> Each cell contains: NOTE + INSTRUMENT + VOLUME + EFFECT. It's like a tiny musical DNA sequence!
+            </div>
+
+            <h3>The Four Sacred Channels</h3>
+            <ul>
+                <li><strong>CH1:</strong> Lead melodies (the main character of your song)</li>
+                <li><strong>CH2:</strong> Bass lines (the foundation, the bedrock, the thicc beats)</li>
+                <li><strong>CH3:</strong> Percussion (the spice, the rhythm, the <em>bonk bonk</em>)</li>
+                <li><strong>CH4:</strong> Arpeggios/Effects (the sparkly bits that make everything ✨fancy✨)</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>Chapter 2: Keyboard Kombat</h2>
+            <div class="meme-reference">
+                "It's over 9000!" - Your WPM after mastering these shortcuts
+            </div>
+
+            <h3>Basic Navigation (AKA "How to Move Around Like a Pro")</h3>
+            <ul>
+                <li><span class="key-combo">Arrow Keys</span> - Navigate the pattern grid (your WASD equivalent)</li>
+                <li><span class="key-combo">Page Up/Down</span> - Jump 16 rows (warp speed)</li>
+                <li><span class="key-combo">Home/End</span> - Go to first/last row (teleportation)</li>
+                <li><span class="key-combo">Tab/Shift+Tab</span> - Switch channels (dimension hopping)</li>
+            </ul>
+
+            <h3>Note Entry (The Ancient Ritual)</h3>
+            <p>The keyboard is mapped like a piano, but <em>sideways</em> because trackers are rebellious:</p>
+
+            <div class="code-block">Lower Row (Octave 4):
+Z=C  S=C# X=D  D=D# C=E  V=F  G=F# B=G  H=G# N=A  J=A# M=B
+
+Upper Row (Octave 5):
+Q=C  2=C# W=D  3=D# E=E  R=F  5=F# T=G  6=G# Y=A  7=A# U=B</div>
+
+            <div class="warning">
+                <strong>WARNING:</strong> Your fingers will hurt at first. This is normal. You are evolving into a higher life form.
+            </div>
+
+            <h3>Playback Controls</h3>
+            <ul>
+                <li><span class="key-combo">Space</span> - Play/Pause (the most important key)</li>
+                <li><span class="key-combo">Enter</span> - Stop (emergency brake)</li>
+                <li><span class="key-combo">F1-F4</span> - Select instruments (quick weapon swap)</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>Chapter 3: The Art of the Chiptune</h2>
+            <h3>What Makes a Chiptune Chip?</h3>
+            <p>Chiptunes are the musical equivalent of pixel art - beautiful in their limitation. We're working with:</p>
+            <ul>
+                <li><strong>Square Waves:</strong> The bread and butter (sounds like old video games)</li>
+                <li><strong>Pulse Waves:</strong> Square waves with attitude</li>
+                <li><strong>Triangle Waves:</strong> Smooth operators (perfect for bass)</li>
+                <li><strong>Noise:</strong> The chaos element (drums and percussion)</li>
+            </ul>
+
+            <div class="meme-reference">
+                "Why limit yourself to 4 channels?" - Because constraints breed creativity, young padawan.
+            </div>
+
+            <h3>Your First Pattern</h3>
+            <p>Let's create a basic 4/4 beat pattern. Follow along:</p>
+
+            <div class="pattern-example">1. Add a kick drum on rows 00, 16, 32, 48 (Channel 3)
+2. Add bass notes on rows 00, 08, 16, 24 (Channel 2) 
+3. Add melody on rows 00, 04, 08, 12 (Channel 1)
+4. Sprinkle arpeggios everywhere (Channel 4)</div>
+
+            <div class="tip">
+                <strong>Ancient Wisdom:</strong> Start simple. Even Mozart didn't compose symphonies on day one (and he didn't have trackers, the peasant).
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Chapter 4: Advanced Wizardry</h2>
+            <h3>The ADSR Envelope (Not a Greeting Card)</h3>
+            <p>ADSR controls how your sounds behave over time:</p>
+            <ul>
+                <li><strong>Attack:</strong> How fast the sound starts (0 = instant, higher = fade in)</li>
+                <li><strong>Decay:</strong> How fast it drops from peak to sustain level</li>
+                <li><strong>Sustain:</strong> The level it holds while the note plays</li>
+                <li><strong>Release:</strong> How fast it fades when you let go</li>
+            </ul>
+
+            <div class="code-block">Quick ADSR Settings:
+- Percussive: A=0.01, D=0.1, S=0, R=0.1 (sharp hits)
+- Pad: A=0.3, D=0.2, S=0.7, R=1.0 (smooth and sustained)
+- Pluck: A=0.05, D=0.3, S=0.3, R=0.5 (guitar-like)</div>
+
+            <h3>Pattern Sequencing</h3>
+            <p>Once you have patterns, chain them together into songs. Think of patterns as LEGO blocks - you can reuse and rearrange them infinitely.</p>
+
+            <div class="rainbow">♪ CONGRATULATIONS! YOU'RE NOW 1337 TRACKER ♪</div>
+        </div>
+
+        <div class="section">
+            <h2>Chapter 5: The Meme Economy of Chiptunes</h2>
+            <h3>Common Tracker Memes & References</h3>
+            <ul>
+                <li><strong>"One more pattern..."</strong> - Famous last words before staying up until 4 AM</li>
+                <li><strong>The Amen Break:</strong> Most sampled drum break in history (not in chiptunes, but respect)</li>
+                <li><strong>"It's not a bug, it's a feature":</strong> When your glitchy sound becomes the best part</li>
+                <li><strong>Channel Overflow:</strong> When you need 47 channels but only have 4</li>
+            </ul>
+
+            <div class="meme-reference">
+                <strong>Internet Culture Moment:</strong><br>
+                Tracker musicians are basically the assembly programmers of music - they do more with less, and they're proud of it.
+            </div>
+
+            <h3>The Demo Scene Connection</h3>
+            <p>Trackers come from the demo scene - underground computer art communities where programmers showed off by creating impossible audiovisual experiences in impossibly small file sizes. You're part of this legacy now!</p>
+        </div>
+
+        <div class="section">
+            <h2>Chapter 6: Quick Reference Card</h2>
+            <div class="code-block">EMERGENCY CHEAT SHEET:
+===================
+Navigation:    Arrows, Page Up/Down, Home/End, Tab
+Notes:         Z-M (octave 4), Q-U (octave 5) 
+Modifiers:     Shift (+1 oct), Ctrl (-1 oct)
+Playback:      Space (play), Enter (stop)
+Tools:         Delete (clear), Ctrl+C/V (copy/paste)
+Instruments:   F1-F4 (select), tweak ADSR sliders
+Export:        Save project, Export WAV/MIDI
+PANIC BUTTON:  Refresh the page 😅</div>
+
+            <div class="warning">
+                <strong>Remember:</strong> If all else fails, just press random keys until it sounds cool. This is a legitimate composition technique called "algorithmic generation" (or "happy accidents").
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Final Boss: Going Further</h2>
+            <h3>Level Up Your Skills</h3>
+            <ul>
+                <li>Study classic chiptunes (Mega Man, Zelda, Commodore 64 classics)</li>
+                <li>Experiment with different time signatures</li>
+                <li>Layer patterns for complex arrangements</li>
+                <li>Share your creations with the world!</li>
+            </ul>
+
+            <div class="scrolling-text">
+                🎵 *** YOU HAVE COMPLETED THE TUTORIAL *** WELCOME TO THE CHIPTUNE UNDERGROUND *** MAKE BEATS, NOT WAR *** 🎵
+            </div>
+
+            <div class="ascii-art">
+    ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+    ░ NOW GO FORTH AND COMPOSE! ░
+    ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+            </div>
+        </div>
+    </div>
+</body>
+</html>

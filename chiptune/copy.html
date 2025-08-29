@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChipTracker - Dancing to the Beat</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(45deg, #000428 0%, #004e92 100%);
+            color: #00ff41;
+            min-height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .main-container {
+            display: flex;
+            height: 100vh;
+        }
+
+        .copy-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 40px;
+            position: relative;
+        }
+
+        .dancing-sidebar {
+            width: 300px;
+            background: rgba(0, 0, 0, 0.9);
+            border-left: 2px solid #00ff41;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .title {
+            font-size: 48px;
+            font-weight: bold;
+            text-shadow: 0 0 20px #00ff41;
+            letter-spacing: 5px;
+            margin-bottom: 20px;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from { text-shadow: 0 0 20px #00ff41; }
+            to { text-shadow: 0 0 30px #00ff41, 0 0 40px #00ff41; }
+        }
+
+        .subtitle {
+            font-size: 18px;
+            color: #ff6b35;
+            text-shadow: 0 0 10px #ff6b35;
+            margin-bottom: 30px;
+        }
+
+        .copy-text {
+            max-width: 600px;
+            line-height: 1.8;
+            margin-bottom: 30px;
+            color: #cccccc;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #1a1a1a, #333);
+            border: 1px solid #00ff41;
+            color: #00ff41;
+            padding: 12px 24px;
+            cursor: pointer;
+            font-family: inherit;
+            text-decoration: none;
+            text-transform: uppercase;
+            transition: all 0.3s;
+            border-radius: 3px;
+        }
+
+        .btn:hover {
+            background: linear-gradient(45deg, #333, #555);
+            box-shadow: 0 0 10px rgba(0, 255, 65, 0.7);
+            transform: translateY(-1px);
+        }
+
+        .dancer {
+            font-family: monospace;
+            font-size: 14px;
+            line-height: 1;
+            white-space: pre;
+            color: #00ff41;
+            text-shadow: 0 0 5px #00ff41;
+            margin: 20px 0;
+            position: relative;
+            animation: dance-idle 4s ease-in-out infinite;
+        }
+
+        .dancer.dancing {
+            animation: dance-beat 0.5s ease-in-out infinite;
+        }
+
+        @keyframes dance-idle {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            25% { transform: translateY(-2px) rotate(1deg); }
+            50% { transform: translateY(0px) rotate(0deg); }
+            75% { transform: translateY(-1px) rotate(-1deg); }
+        }
+
+        @keyframes dance-beat {
+            0%, 100% { 
+                transform: translateY(0px) scale(1) rotate(0deg);
+                text-shadow: 0 0 5px #00ff41;
+            }
+            25% { 
+                transform: translateY(-8px) scale(1.1) rotate(5deg);
+                text-shadow: 0 0 15px #00ff41, 0 0 25px #00ff41;
+            }
+            50% { 
+                transform: translateY(-3px) scale(1.05) rotate(0deg);
+                text-shadow: 0 0 10px #00ff41;
+            }
+            75% { 
+                transform: translateY(-6px) scale(1.08) rotate(-3deg);
+                text-shadow: 0 0 12px #00ff41;
+            }
+        }
+
+        .dance-floor {
+            position: absolute;
+            bottom: 50px;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, 
+                transparent, 
+                rgba(0, 255, 65, 0.5), 
+                rgba(255, 107, 53, 0.5), 
+                rgba(255, 255, 0, 0.5),
+                transparent
+            );
+            animation: floor-pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes floor-pulse {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+
+        .beat-indicator {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            text-align: center;
+            color: #ff6b35;
+            font-size: 12px;
+        }
+
+        .music-note {
+            position: absolute;
+            font-size: 20px;
+            color: #ffff00;
+            animation: float-note 3s ease-in-out infinite;
+        }
+
+        @keyframes float-note {
+            0% { 
+                transform: translateY(0px) rotate(0deg);
+                opacity: 0;
+            }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { 
+                transform: translateY(-100px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        .disco-lights {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 10px;
+            background: linear-gradient(45deg,
+                #ff0000, #ff8000, #ffff00, #00ff00, #0080ff, #8000ff
+            );
+            animation: disco-sweep 1s linear infinite;
+            opacity: 0.7;
+        }
+
+        @keyframes disco-sweep {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .equalizer {
+            display: flex;
+            justify-content: space-around;
+            align-items: flex-end;
+            width: 200px;
+            height: 60px;
+            margin: 20px 0;
+        }
+
+        .eq-bar {
+            width: 12px;
+            background: linear-gradient(to top, #ff0000, #ffff00, #00ff00);
+            margin: 0 2px;
+            animation: eq-bounce 0.8s ease-in-out infinite;
+        }
+
+        .eq-bar:nth-child(1) { animation-delay: 0s; }
+        .eq-bar:nth-child(2) { animation-delay: 0.1s; }
+        .eq-bar:nth-child(3) { animation-delay: 0.2s; }
+        .eq-bar:nth-child(4) { animation-delay: 0.3s; }
+        .eq-bar:nth-child(5) { animation-delay: 0.4s; }
+        .eq-bar:nth-child(6) { animation-delay: 0.1s; }
+        .eq-bar:nth-child(7) { animation-delay: 0.2s; }
+
+        @keyframes eq-bounce {
+            0%, 100% { height: 10px; }
+            50% { height: 40px; }
+        }
+
+        .copyright {
+            position: absolute;
+            bottom: 20px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-size: 10px;
+            color: #666;
+        }
+
+        .sparkles {
+            position: absolute;
+            font-size: 12px;
+            color: #ffff00;
+            animation: sparkle 2s ease-in-out infinite;
+        }
+
+        @keyframes sparkle {
+            0%, 100% { opacity: 0; transform: scale(0.5); }
+            50% { opacity: 1; transform: scale(1); }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <div class="copy-content">
+            <h1 class="title">CHIPTRACKER</h1>
+            <p class="subtitle">Demoscene Chiptune Generator</p>
+            
+            <div class="copy-text">
+                <p><strong>Welcome to the underground world of chiptune tracking!</strong></p>
+                <p>ChipTracker brings the authentic demoscene experience to your browser. Create authentic 8-bit music with classic tracker workflow, complete with four-channel synthesis, ADSR envelopes, and that sweet nostalgic sound.</p>
+                <p>Born from the hacker culture of the 1980s demo scene, trackers revolutionized computer music. Now you can carry on this tradition with modern web technology.</p>
+                <p><em>"It's not just music software - it's a way of life."</em></p>
+            </div>
+
+            <div class="nav-buttons">
+                <a href="index.html" class="btn">🎵 Start Tracking</a>
+                <a href="learn.html" class="btn">📚 Learn</a>
+            </div>
+
+            <div class="copyright">
+                © 2024 ChipTracker | Made with ❤️ for the demoscene community
+            </div>
+        </div>
+
+        <div class="dancing-sidebar">
+            <div class="disco-lights"></div>
+            
+            <div class="beat-indicator">
+                <span id="beatCounter">♪ Feeling the beat ♪</span>
+            </div>
+
+            <div class="dancer" id="dancer">
+    O
+   /|\
+   / \</div>
+
+            <div class="equalizer">
+                <div class="eq-bar"></div>
+                <div class="eq-bar"></div>
+                <div class="eq-bar"></div>
+                <div class="eq-bar"></div>
+                <div class="eq-bar"></div>
+                <div class="eq-bar"></div>
+                <div class="eq-bar"></div>
+            </div>
+
+            <div class="dance-floor"></div>
+
+            <div class="sparkles" style="top: 30%; left: 20%;">✨</div>
+            <div class="sparkles" style="top: 60%; right: 30%; animation-delay: 1s;">⭐</div>
+            <div class="sparkles" style="top: 80%; left: 40%; animation-delay: 1.5s;">✨</div>
+        </div>
+    </div>
+
+    <script>
+        // Simple chiptune audio engine for the about page
+        class SimpleChiptunePlayer {
+            constructor() {
+                this.audioContext = null;
+                this.isPlaying = false;
+                this.currentNote = 0;
+                this.intervalId = null;
+                
+                // Simple melody sequence
+                this.melody = [
+                    { note: 'C5', duration: 200 },
+                    { note: 'E5', duration: 200 },
+                    { note: 'G5', duration: 200 },
+                    { note: 'C6', duration: 400 },
+                    { note: 'G5', duration: 200 },
+                    { note: 'E5', duration: 200 },
+                    { note: 'C5', duration: 400 },
+                    { note: null, duration: 200 },
+                    { note: 'D5', duration: 200 },
+                    { note: 'F5', duration: 200 },
+                    { note: 'A5', duration: 200 },
+                    { note: 'D6', duration: 400 },
+                    { note: 'A5', duration: 200 },
+                    { note: 'F5', duration: 200 },
+                    { note: 'D5', duration: 400 },
+                    { note: null, duration: 400 }
+                ];
+            }
+
+            async initialize() {
+                this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                console.log('Simple chiptune player initialized');
+            }
+
+            noteToFrequency(note) {
+                const noteNames = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+                const match = note.match(/([A-G]#?)(\d+)/);
+                
+                if (!match) return 0;
+                
+                const noteName = match[1];
+                const octave = parseInt(match[2]);
+                const noteIndex = noteNames.indexOf(noteName);
+                const midiNote = (octave + 1) * 12 + noteIndex;
+                
+                return 440 * Math.pow(2, (midiNote - 69) / 12);
+            }
+
+            playNote(note, duration) {
+                if (!note) return;
+
+                const frequency = this.noteToFrequency(note);
+                const oscillator = this.audioContext.createOscillator();
+                const gainNode = this.audioContext.createGain();
+
+                oscillator.type = 'square';
+                oscillator.frequency.setValueAtTime(frequency, this.audioContext.currentTime);
+                
+                gainNode.gain.setValueAtTime(0.1, this.audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.001, this.audioContext.currentTime + duration / 1000);
+
+                oscillator.connect(gainNode);
+                gainNode.connect(this.audioContext.destination);
+
+                oscillator.start();
+                oscillator.stop(this.audioContext.currentTime + duration / 1000);
+            }
+
+            startAutoPlay() {
+                if (this.isPlaying) return;
+                
+                this.isPlaying = true;
+                this.currentNote = 0;
+                
+                const playSequence = () => {
+                    if (!this.isPlaying) return;
+                    
+                    const currentMelody = this.melody[this.currentNote];
+                    if (currentMelody.note) {
+                        this.playNote(currentMelody.note, currentMelody.duration);
+                    }
+                    
+                    this.currentNote = (this.currentNote + 1) % this.melody.length;
+                    
+                    setTimeout(playSequence, currentMelody.duration);
+                };
+                
+                playSequence();
+            }
+        }
+
+        class DancingFigure {
+            constructor(musicPlayer) {
+                this.musicPlayer = musicPlayer;
+                this.dancer = document.getElementById('dancer');
+                this.beatCounter = document.getElementById('beatCounter');
+                this.currentPose = 0;
+                this.isActive = false;
+                this.musicNotes = [];
+                
+                // Different dance poses
+                this.poses = [
+                    // Basic pose
+                    `    O
+   /|\\
+   / \\`,
+                    // Arms up
+                    `  \\O/
+    |
+   / \\`,
+                    // Side step left  
+                    ` O
+/|\\
+/  \\`,
+                    // Side step right
+                    `   O
+  /|\\
+ /  \\`,
+                    // Jump
+                    `  \\O/
+    |
+    
+   ^ ^`,
+                    // Lean left
+                    `O
+|\\
+ \\`,
+                    // Lean right
+                    `   O
+  /|
+  /`,
+                    // Disco point
+                    `  \\O
+    |\\
+   / \\`,
+                    // Party hands
+                    `\\O O/
+  |
+ / \\`,
+                    // Cool pose
+                    `  O<
+ /|
+ / >`
+                ];
+
+                this.startDancing();
+                this.addMusicNotes();
+                this.updateBeatCounter();
+            }
+
+            startDancing() {
+                // Start the main dance loop
+                setInterval(() => {
+                    this.dance();
+                }, 500); // Dance every 500ms (120 BPM feel)
+
+                // Add some randomness
+                setInterval(() => {
+                    this.randomMove();
+                }, 800);
+
+                // Special moves occasionally
+                setInterval(() => {
+                    this.specialMove();
+                }, 3000);
+            }
+
+            dance() {
+                this.dancer.classList.add('dancing');
+                this.currentPose = (this.currentPose + 1) % this.poses.length;
+                this.dancer.textContent = this.poses[this.currentPose];
+                
+                setTimeout(() => {
+                    this.dancer.classList.remove('dancing');
+                }, 400);
+            }
+
+            randomMove() {
+                // Random pose for variety
+                const randomPose = Math.floor(Math.random() * this.poses.length);
+                this.dancer.textContent = this.poses[randomPose];
+            }
+
+            specialMove() {
+                // Special dance sequence
+                const specialSequence = [8, 9, 1, 4, 3, 2]; // Party sequence
+                let step = 0;
+                
+                const doSpecial = () => {
+                    if (step < specialSequence.length) {
+                        this.dancer.textContent = this.poses[specialSequence[step]];
+                        this.dancer.classList.add('dancing');
+                        setTimeout(() => {
+                            this.dancer.classList.remove('dancing');
+                        }, 200);
+                        step++;
+                        setTimeout(doSpecial, 250);
+                    }
+                };
+                
+                doSpecial();
+            }
+
+            addMusicNotes() {
+                setInterval(() => {
+                    this.createMusicNote();
+                }, 1000);
+            }
+
+            createMusicNote() {
+                const notes = ['♪', '♫', '♬', '♩', '♭', '♯', '𝄞'];
+                const note = document.createElement('div');
+                note.className = 'music-note';
+                note.textContent = notes[Math.floor(Math.random() * notes.length)];
+                note.style.left = Math.random() * 80 + 10 + '%';
+                note.style.animationDuration = (Math.random() * 2 + 2) + 's';
+                
+                document.querySelector('.dancing-sidebar').appendChild(note);
+                
+                setTimeout(() => {
+                    if (note.parentNode) {
+                        note.parentNode.removeChild(note);
+                    }
+                }, 4000);
+            }
+
+            updateBeatCounter() {
+                const messages = [
+                    "♪ Feeling the beat ♪",
+                    "🎵 Dance revolution 🎵", 
+                    "✨ Chiptune magic ✨",
+                    "🕺 Demoscene vibes 🕺",
+                    "🎶 8-bit paradise 🎶",
+                    "💫 Tracker power 💫",
+                    "🎸 Digital harmony 🎸",
+                    "🌟 Sound synthesis 🌟"
+                ];
+                
+                let messageIndex = 0;
+                setInterval(() => {
+                    this.beatCounter.textContent = messages[messageIndex];
+                    messageIndex = (messageIndex + 1) % messages.length;
+                }, 2000);
+            }
+        }
+
+        // Enhanced background effects
+        class BackgroundEffects {
+            constructor() {
+                this.addFloatingElements();
+                this.addMatrixRain();
+            }
+
+            addFloatingElements() {
+                const symbols = ['◆', '◇', '▲', '△', '●', '○', '★', '☆'];
+                
+                setInterval(() => {
+                    const element = document.createElement('div');
+                    element.style.cssText = `
+                        position: absolute;
+                        font-size: ${Math.random() * 20 + 10}px;
+                        color: rgba(0, 255, 65, ${Math.random() * 0.3 + 0.1});
+                        left: ${Math.random() * 100}%;
+                        top: -50px;
+                        pointer-events: none;
+                        animation: float-down ${Math.random() * 10 + 5}s linear forwards;
+                        z-index: -1;
+                    `;
+                    element.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+                    
+                    const style = document.createElement('style');
+                    style.textContent = `
+                        @keyframes float-down {
+                            to {
+                                transform: translateY(100vh) rotate(360deg);
+                                opacity: 0;
+                            }
+                        }
+                    `;
+                    document.head.appendChild(style);
+                    
+                    document.body.appendChild(element);
+                    
+                    setTimeout(() => {
+                        if (element.parentNode) {
+                            element.parentNode.removeChild(element);
+                        }
+                    }, 15000);
+                }, 2000);
+            }
+
+            addMatrixRain() {
+                // Subtle matrix-style code rain in the background
+                const chars = '01ABCDEF♪♫♬';
+                
+                setInterval(() => {
+                    const rain = document.createElement('div');
+                    rain.style.cssText = `
+                        position: absolute;
+                        font-family: monospace;
+                        font-size: 12px;
+                        color: rgba(0, 255, 65, 0.1);
+                        left: ${Math.random() * 100}%;
+                        top: -20px;
+                        pointer-events: none;
+                        animation: matrix-fall ${Math.random() * 8 + 4}s linear forwards;
+                        z-index: -2;
+                    `;
+                    rain.textContent = chars[Math.floor(Math.random() * chars.length)];
+                    
+                    document.body.appendChild(rain);
+                    
+                    const matrixStyle = document.createElement('style');
+                    matrixStyle.textContent = `
+                        @keyframes matrix-fall {
+                            to {
+                                transform: translateY(100vh);
+                                opacity: 0;
+                            }
+                        }
+                    `;
+                    document.head.appendChild(matrixStyle);
+                    
+                    setTimeout(() => {
+                        if (rain.parentNode) {
+                            rain.parentNode.removeChild(rain);
+                        }
+                    }, 12000);
+                }, 300);
+            }
+        }
+
+        // Initialize everything when page loads
+        document.addEventListener('DOMContentLoaded', async () => {
+            const musicPlayer = new SimpleChiptunePlayer();
+            const dancer = new DancingFigure(musicPlayer);
+            const effects = new BackgroundEffects();
+            
+            // Auto-start music after a short delay
+            setTimeout(async () => {
+                try {
+                    await musicPlayer.initialize();
+                    musicPlayer.startAutoPlay();
+                    console.log('🎵 Auto-playing chiptune demo!');
+                } catch (error) {
+                    console.log('Auto-play blocked by browser. Click anywhere to start music!');
+                    document.addEventListener('click', async () => {
+                        try {
+                            await musicPlayer.initialize();
+                            musicPlayer.startAutoPlay();
+                        } catch (e) {
+                            console.log('Could not start music:', e);
+                        }
+                    }, { once: true });
+                }
+            }, 1000);
+            
+            // Add some interactive effects
+            document.addEventListener('mousemove', (e) => {
+                const sidebar = document.querySelector('.dancing-sidebar');
+                const rect = sidebar.getBoundingClientRect();
+                
+                if (e.clientX > rect.left && e.clientX < rect.right) {
+                    sidebar.style.filter = 'brightness(1.2) saturate(1.3)';
+                } else {
+                    sidebar.style.filter = 'brightness(1) saturate(1)';
+                }
+            });
+
+            console.log(`
+╔═══════════════════════════════════════╗
+║  Welcome to ChipTracker Dance Floor!  ║
+║                                       ║
+║  🕺 The dancer responds to the beat   ║
+║  ✨ Watch the visual effects          ║  
+║  🎵 Ready to create some chiptunes?   ║
+║  🎶 Auto-playing demo music!         ║
+╚═══════════════════════════════════════╝
+            `);
+        });
+    </script>
+</body>
+</html>

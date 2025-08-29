@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChipTracker - Demoscene Style Chiptune Generator</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="header-left">
+                <button id="learnNavBtn" class="nav-btn">📚 LEARN</button>
+                <button id="aboutNavBtn" class="nav-btn">ℹ️ ABOUT</button>
+            </div>
+            <h1 class="title">CHIPTRACKER</h1>
+            <div class="controls">
+                <button id="playBtn" class="btn">PLAY</button>
+                <button id="stopBtn" class="btn">STOP</button>
+                <button id="pauseBtn" class="btn">PAUSE</button>
+                <span class="tempo-control">
+                    TEMPO: <input type="range" id="tempoSlider" min="80" max="200" value="120">
+                    <span id="tempoValue">120</span>
+                </span>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <div class="left-panel">
+                <div class="instrument-panel">
+                    <h3>INSTRUMENTS</h3>
+                    <div class="instrument-list" id="instrumentList">
+                        <div class="instrument active" data-instrument="0">01. LEAD</div>
+                        <div class="instrument" data-instrument="1">02. BASS</div>
+                        <div class="instrument" data-instrument="2">03. DRUM</div>
+                        <div class="instrument" data-instrument="3">04. ARPEG</div>
+                    </div>
+                </div>
+
+                <div class="channel-panel">
+                    <h3>CHANNELS</h3>
+                    <div class="channel-controls">
+                        <div class="channel">
+                            <span>CH1</span>
+                            <input type="range" class="volume" min="0" max="100" value="80">
+                            <button class="mute">M</button>
+                        </div>
+                        <div class="channel">
+                            <span>CH2</span>
+                            <input type="range" class="volume" min="0" max="100" value="80">
+                            <button class="mute">M</button>
+                        </div>
+                        <div class="channel">
+                            <span>CH3</span>
+                            <input type="range" class="volume" min="0" max="100" value="80">
+                            <button class="mute">M</button>
+                        </div>
+                        <div class="channel">
+                            <span>CH4</span>
+                            <input type="range" class="volume" min="0" max="100" value="80">
+                            <button class="mute">M</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="instrument-editor">
+                    <h3>INSTRUMENT EDITOR</h3>
+                    <div class="param-group">
+                        <label>WAVEFORM:</label>
+                        <select id="waveform">
+                            <option value="square">SQUARE</option>
+                            <option value="pulse">PULSE</option>
+                            <option value="triangle">TRIANGLE</option>
+                            <option value="noise">NOISE</option>
+                        </select>
+                    </div>
+                    <div class="param-group">
+                        <label>ATTACK:</label>
+                        <input type="range" id="attack" min="0" max="1" step="0.01" value="0.1">
+                    </div>
+                    <div class="param-group">
+                        <label>DECAY:</label>
+                        <input type="range" id="decay" min="0" max="1" step="0.01" value="0.3">
+                    </div>
+                    <div class="param-group">
+                        <label>SUSTAIN:</label>
+                        <input type="range" id="sustain" min="0" max="1" step="0.01" value="0.7">
+                    </div>
+                    <div class="param-group">
+                        <label>RELEASE:</label>
+                        <input type="range" id="release" min="0" max="2" step="0.01" value="0.5">
+                    </div>
+                </div>
+            </div>
+
+            <div class="pattern-editor">
+                <div class="pattern-header">
+                    <h3>PATTERN EDITOR</h3>
+                    <div class="pattern-controls">
+                        <span>PATTERN: <select id="patternSelect">
+                            <option value="0">00</option>
+                            <option value="1">01</option>
+                            <option value="2">02</option>
+                            <option value="3">03</option>
+                        </select></span>
+                        <span>ROW: <span id="currentRow">00</span></span>
+                        <span>CH: <span id="currentChannel">1</span></span>
+                        <span>INST: <span id="currentInstrument">01</span></span>
+                    </div>
+                </div>
+                <div class="tracker-grid" id="trackerGrid">
+                </div>
+                <div class="editing-help">
+                    <small><strong>EDITING:</strong> Z-M keys = notes | Arrows = navigate | Tab = switch channel | F1-F4 = instruments | Del = clear</small>
+                </div>
+            </div>
+
+            <div class="right-panel">
+                <div class="pattern-sequence">
+                    <h3>PATTERN SEQUENCE</h3>
+                    <div class="sequence-list" id="sequenceList">
+                        <div class="sequence-item active">00</div>
+                        <div class="sequence-item">01</div>
+                        <div class="sequence-item">02</div>
+                        <div class="sequence-item">03</div>
+                    </div>
+                </div>
+
+                <div class="sample-music-panel">
+                    <h3>CLASSIC CHIPTUNES</h3>
+                    <select id="sampleSelect" class="sample-selector">
+                        <option value="">Load Sample Song...</option>
+                    </select>
+                    <button id="loadSampleBtn" class="btn">LOAD</button>
+                </div>
+
+                <div class="export-panel">
+                    <h3>EXPORT</h3>
+                    <button id="exportWav" class="btn">EXPORT WAV</button>
+                    <button id="exportMidi" class="btn">EXPORT MIDI</button>
+                    <button id="saveProject" class="btn">SAVE PROJECT</button>
+                    <button id="loadProject" class="btn">LOAD PROJECT</button>
+                    <button id="learnBtn" class="btn">LEARN</button>
+                </div>
+
+                <div class="visualizer">
+                    <h3>SPECTRUM</h3>
+                    <canvas id="visualizerCanvas" width="200" height="100"></canvas>
+                </div>
+
+                <div class="dancing-panel">
+                    <h3>DANCE FLOOR</h3>
+                    <div class="mini-dancer" id="miniDancer">
+    O
+   /|\
+   / \</div>
+                    <div class="beat-indicator" id="beatIndicator">♪ Vibing ♪</div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="audio-engine.js"></script>
+    <script src="pattern-editor.js"></script>
+    <script src="main.js"></script>
+</body>
+</html>
