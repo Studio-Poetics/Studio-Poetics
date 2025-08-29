@@ -1,0 +1,1185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Picture Glicture</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #FF006E;
+            color: #FFFFFF;
+            line-height: 1.6;
+            padding: 20px;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+        
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 80%, #8338EC 0%, transparent 40%),
+                radial-gradient(circle at 80% 20%, #FFBE0B 0%, transparent 40%),
+                radial-gradient(circle at 40% 40%, #FB5607 0%, transparent 40%);
+            pointer-events: none;
+            z-index: -1;
+            mix-blend-mode: multiply;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 32px;
+            position: relative;
+            z-index: 1;
+        }
+
+        h1 {
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            font-weight: 900;
+            text-align: center;
+            margin-bottom: 16px;
+            letter-spacing: -0.02em;
+            color: #FFBE0B;
+            text-shadow: 4px 4px 0px #000000, 8px 8px 0px #8338EC;
+            position: relative;
+            transform: rotate(-2deg);
+        }
+        
+        h1::after {
+            content: '';
+            position: absolute;
+            bottom: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 6px;
+            background: #FFBE0B;
+            border-radius: 3px;
+            box-shadow: 2px 2px 0px #000000;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: #FFFFFF;
+            text-align: center;
+            margin-bottom: 40px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            max-width: 500px;
+            text-shadow: 2px 2px 0px #000000;
+            transform: rotate(1deg);
+        }
+
+        .upload-section {
+            width: 100%;
+            max-width: 450px;
+            text-align: center;
+            position: relative;
+        }
+        
+        .upload-section::before {
+            content: '';
+            position: absolute;
+            top: -20px;
+            left: -20px;
+            right: -20px;
+            bottom: -20px;
+            background: #8338EC;
+            border-radius: 24px;
+            pointer-events: none;
+            transform: rotate(-1deg);
+        }
+
+        .upload-btn {
+            display: inline-block;
+            padding: 20px 48px;
+            background: #FFBE0B;
+            color: #000000;
+            border: 4px solid #000000;
+            border-radius: 0;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: 800;
+            transition: all 0.2s ease;
+            margin-bottom: 24px;
+            box-shadow: 6px 6px 0px #000000;
+            position: relative;
+            overflow: hidden;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transform: rotate(1deg);
+        }
+
+        .upload-btn:hover {
+            transform: rotate(1deg) translate(-2px, -2px);
+            box-shadow: 8px 8px 0px #000000;
+            background: #FFD60A;
+        }
+
+        .upload-btn:active {
+            transform: rotate(1deg) translate(2px, 2px);
+            box-shadow: 2px 2px 0px #000000;
+        }
+
+        #fileInput {
+            display: none;
+        }
+
+        .controls {
+            width: 100%;
+            max-width: 600px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .filter-section {
+            width: 100%;
+            text-align: center;
+        }
+
+        .filter-label {
+            display: block;
+            margin-bottom: 24px;
+            font-weight: 900;
+            color: #FFFFFF;
+            font-size: 1.3rem;
+            text-align: center;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            text-shadow: 3px 3px 0px #000000;
+        }
+
+        .effects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 20px;
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 32px;
+            background: #FB5607;
+            border-radius: 0;
+            border: 6px solid #000000;
+            box-shadow: 12px 12px 0px #000000;
+            transform: rotate(-1deg);
+        }
+
+        .effect-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px;
+            background: #FFFFFF;
+            border: 4px solid #000000;
+            border-radius: 0;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            user-select: none;
+            min-height: 56px;
+            position: relative;
+            color: #000000;
+            font-weight: 600;
+            transform: rotate(0.5deg);
+        }
+
+        .effect-item:nth-child(odd) {
+            transform: rotate(-0.5deg);
+        }
+
+        .effect-item:hover {
+            background: #FFD60A;
+            transform: rotate(0.5deg) translate(-2px, -2px);
+            box-shadow: 6px 6px 0px #000000;
+        }
+
+        .effect-item:nth-child(odd):hover {
+            transform: rotate(-0.5deg) translate(-2px, -2px);
+        }
+
+        .effect-item.selected {
+            background: #8338EC;
+            color: #FFFFFF;
+            font-weight: 700;
+            box-shadow: 4px 4px 0px #000000;
+        }
+
+        .effect-item.selected::before {
+            content: '✓';
+            background: #FFBE0B;
+            color: #000000;
+            border-radius: 0;
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            font-weight: 900;
+            flex-shrink: 0;
+            border: 3px solid #000000;
+            box-shadow: 2px 2px 0px #000000;
+        }
+
+        .effect-item:not(.selected)::before {
+            content: '';
+            border: 3px solid #000000;
+            border-radius: 0;
+            width: 28px;
+            height: 28px;
+            flex-shrink: 0;
+            transition: all 0.2s ease;
+            background: #FFFFFF;
+        }
+
+        .effect-item:hover:not(.selected)::before {
+            background: #FB5607;
+        }
+
+        .effect-name {
+            font-size: 0.95rem;
+            font-weight: 500;
+            letter-spacing: 0.3px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .selected-count {
+            margin-top: 20px;
+            padding: 12px 24px;
+            background: #FFBE0B;
+            border: 4px solid #000000;
+            border-radius: 0;
+            color: #000000;
+            font-weight: 800;
+            display: inline-block;
+            font-size: 1rem;
+            box-shadow: 4px 4px 0px #000000;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transform: rotate(-1deg);
+        }
+
+        .fallback-select {
+            display: none;
+            width: 100%;
+            max-width: 400px;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+            background-color: white;
+            height: 120px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 16px 32px;
+            border: 4px solid #000000;
+            background: #FFFFFF;
+            color: #000000;
+            border-radius: 0;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 700;
+            transition: all 0.2s ease;
+            min-width: 160px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 4px 4px 0px #000000;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn:hover {
+            background: #FFD60A;
+            transform: translate(-2px, -2px);
+            box-shadow: 6px 6px 0px #000000;
+        }
+
+        .btn:active {
+            transform: translate(2px, 2px);
+            box-shadow: 1px 1px 0px #000000;
+        }
+
+        .btn.primary {
+            background: #FB5607;
+            color: #FFFFFF;
+        }
+
+        .btn.primary:hover {
+            background: #FF7F51;
+            color: #FFFFFF;
+        }
+
+        .btn.secondary {
+            background: #8338EC;
+            color: #FFFFFF;
+        }
+
+        .btn.secondary:hover {
+            background: #A663CC;
+            color: #FFFFFF;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: 4px 4px 0px #000000;
+            background: #CCCCCC;
+        }
+
+        .btn.loading {
+            pointer-events: none;
+        }
+
+        .btn.loading::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 20px;
+            height: 20px;
+            margin: -10px 0 0 -10px;
+            border: 3px solid transparent;
+            border-top: 3px solid currentColor;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .canvas-container {
+            width: 100%;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        canvas {
+            max-width: 100%;
+            height: auto;
+            border: 6px solid #000000;
+            border-radius: 0;
+            box-shadow: 8px 8px 0px #000000;
+            transition: all 0.2s ease;
+            background: #FFFFFF;
+        }
+        
+        canvas:hover {
+            box-shadow: 12px 12px 0px #000000;
+            transform: translate(-2px, -2px);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .button-group {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .btn {
+                width: 100%;
+                max-width: 320px;
+                min-height: 56px;
+                font-size: 1.1rem;
+                padding: 18px 36px;
+                border-width: 3px;
+                box-shadow: 3px 3px 0px #000000;
+            }
+
+            .effects-grid {
+                grid-template-columns: 1fr;
+                gap: 16px;
+                padding: 24px;
+                border-radius: 0;
+                border-width: 4px;
+                box-shadow: 8px 8px 0px #000000;
+            }
+
+            .effect-item {
+                min-height: 60px;
+                padding: 20px;
+                font-size: 1rem;
+                border-radius: 0;
+                border-width: 3px;
+            }
+
+            .upload-btn {
+                min-height: 60px;
+                font-size: 1.2rem;
+                padding: 22px 44px;
+                border-radius: 0;
+                border-width: 3px;
+                box-shadow: 4px 4px 0px #000000;
+            }
+
+            .fallback-select {
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Picture Glicture</h1>
+        <p class="subtitle">Transform everyday objects into surreal digital twins</p>
+        
+        <div class="upload-section">
+            <label for="fileInput" class="upload-btn">Choose Image</label>
+            <input type="file" id="fileInput" accept="image/*">
+        </div>
+
+        <div class="controls hidden" id="controls">
+            <div class="filter-section">
+                <label class="filter-label">Select Glitch Effects</label>
+                <div class="effects-grid" id="effectsGrid">
+                    <div class="effect-item" data-effect="pixelSort">
+                        <span class="effect-name">Pixel Sorting</span>
+                    </div>
+                    <div class="effect-item" data-effect="datamosh">
+                        <span class="effect-name">Datamosh Frame Blending</span>
+                    </div>
+                    <div class="effect-item" data-effect="vhsStatic">
+                        <span class="effect-name">VHS Static/Scanlines</span>
+                    </div>
+                    <div class="effect-item" data-effect="chromatic">
+                        <span class="effect-name">RGB Channel Shift</span>
+                    </div>
+                    <div class="effect-item" data-effect="ascii">
+                        <span class="effect-name">ASCII Art Overlay</span>
+                    </div>
+                    <div class="effect-item" data-effect="posterize">
+                        <span class="effect-name">Posterization</span>
+                    </div>
+                    <div class="effect-item" data-effect="noise">
+                        <span class="effect-name">Noise/Grain Injection</span>
+                    </div>
+                    <div class="effect-item" data-effect="pixelate">
+                        <span class="effect-name">Block Pixelation</span>
+                    </div>
+                    <div class="effect-item" data-effect="invert">
+                        <span class="effect-name">Color Inversion</span>
+                    </div>
+                    <div class="effect-item" data-effect="solarize">
+                        <span class="effect-name">Solarize Effect</span>
+                    </div>
+                    <div class="effect-item" data-effect="edges">
+                        <span class="effect-name">Edge Detection</span>
+                    </div>
+                    <div class="effect-item" data-effect="wave">
+                        <span class="effect-name">Wave Distortion</span>
+                    </div>
+                    <div class="effect-item" data-effect="kaleidoscope">
+                        <span class="effect-name">Kaleidoscope Mirror</span>
+                    </div>
+                    <div class="effect-item" data-effect="colorCycle">
+                        <span class="effect-name">Color Cycling</span>
+                    </div>
+                    <div class="effect-item" data-effect="scanlineOffset">
+                        <span class="effect-name">Scanline Offset</span>
+                    </div>
+                </div>
+                <div class="selected-count" id="selectedCount">0 effects selected</div>
+                
+                <!-- Fallback select for accessibility -->
+                <select id="filterSelect" multiple class="fallback-select">
+                    <option value="pixelSort">Pixel Sorting</option>
+                    <option value="datamosh">Datamosh Frame Blending</option>
+                    <option value="vhsStatic">VHS Static/Scanlines</option>
+                    <option value="chromatic">RGB Channel Shift</option>
+                    <option value="ascii">ASCII Art Overlay</option>
+                    <option value="posterize">Posterization</option>
+                    <option value="noise">Noise/Grain Injection</option>
+                    <option value="pixelate">Block Pixelation</option>
+                    <option value="invert">Color Inversion</option>
+                    <option value="solarize">Solarize Effect</option>
+                    <option value="edges">Edge Detection</option>
+                    <option value="wave">Wave Distortion</option>
+                    <option value="kaleidoscope">Kaleidoscope Mirror</option>
+                    <option value="colorCycle">Color Cycling</option>
+                    <option value="scanlineOffset">Scanline Offset</option>
+                </select>
+            </div>
+            
+            <div class="button-group">
+                <button class="btn secondary" id="applyBtn" disabled>
+                    <span class="btn-text">Apply Effects</span>
+                </button>
+                <button class="btn" id="randomizeBtn">
+                    <span class="btn-text">🎲 Randomize</span>
+                </button>
+                <button class="btn" id="resetBtn">
+                    <span class="btn-text">↺ Reset</span>
+                </button>
+                <button class="btn primary" id="downloadBtn">
+                    <span class="btn-text">⬇ Download</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="canvas-container">
+            <canvas id="canvas"></canvas>
+        </div>
+    </div>
+
+    <script>
+        class PictureGlicture {
+            constructor() {
+                this.canvas = document.getElementById('canvas');
+                this.ctx = this.canvas.getContext('2d');
+                this.originalImageData = null;
+                this.currentImageData = null;
+                this.originalImage = null;
+                this.selectedEffects = new Set();
+                
+                this.initEventListeners();
+                this.updateSelectedCount();
+            }
+
+            initEventListeners() {
+                document.getElementById('fileInput').addEventListener('change', this.handleFileUpload.bind(this));
+                document.getElementById('applyBtn').addEventListener('click', this.applySelectedEffects.bind(this));
+                document.getElementById('randomizeBtn').addEventListener('click', this.randomizeEffects.bind(this));
+                document.getElementById('resetBtn').addEventListener('click', this.resetImage.bind(this));
+                document.getElementById('downloadBtn').addEventListener('click', this.downloadImage.bind(this));
+                
+                // Add effect selection listeners
+                document.querySelectorAll('.effect-item').forEach(item => {
+                    item.addEventListener('click', this.toggleEffect.bind(this));
+                });
+            }
+
+            toggleEffect(event) {
+                const effectItem = event.currentTarget;
+                const effectName = effectItem.dataset.effect;
+                
+                if (this.selectedEffects.has(effectName)) {
+                    this.selectedEffects.delete(effectName);
+                    effectItem.classList.remove('selected');
+                } else {
+                    this.selectedEffects.add(effectName);
+                    effectItem.classList.add('selected');
+                }
+                
+                this.updateSelectedCount();
+                this.updateApplyButton();
+                this.syncFallbackSelect();
+            }
+
+            updateSelectedCount() {
+                const count = this.selectedEffects.size;
+                const countElement = document.getElementById('selectedCount');
+                countElement.textContent = `${count} effect${count !== 1 ? 's' : ''} selected`;
+                countElement.style.display = count > 0 ? 'inline-block' : 'none';
+            }
+
+            updateApplyButton() {
+                const applyBtn = document.getElementById('applyBtn');
+                applyBtn.disabled = this.selectedEffects.size === 0 || !this.originalImageData;
+            }
+
+            syncFallbackSelect() {
+                const select = document.getElementById('filterSelect');
+                Array.from(select.options).forEach(option => {
+                    option.selected = this.selectedEffects.has(option.value);
+                });
+            }
+
+            setButtonLoading(buttonId, loading) {
+                const btn = document.getElementById(buttonId);
+                const btnText = btn.querySelector('.btn-text');
+                
+                if (loading) {
+                    btn.classList.add('loading');
+                    btn.disabled = true;
+                    if (btnText) btnText.style.opacity = '0';
+                } else {
+                    btn.classList.remove('loading');
+                    btn.disabled = false;
+                    if (btnText) btnText.style.opacity = '1';
+                }
+            }
+
+            handleFileUpload(event) {
+                const file = event.target.files[0];
+                if (file && file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        this.loadImage(e.target.result);
+                    };
+                    reader.readAsDataURL(file);
+                }
+            }
+
+            loadImage(src) {
+                this.originalImage = new Image();
+                this.originalImage.onload = () => {
+                    this.setupCanvas();
+                    this.drawOriginalImage();
+                    this.storeOriginalImageData();
+                    document.getElementById('controls').classList.remove('hidden');
+                    this.updateApplyButton();
+                };
+                this.originalImage.src = src;
+            }
+
+            setupCanvas() {
+                const maxWidth = Math.min(800, window.innerWidth - 40);
+                const aspectRatio = this.originalImage.height / this.originalImage.width;
+                
+                this.canvas.width = Math.min(this.originalImage.width, maxWidth);
+                this.canvas.height = this.canvas.width * aspectRatio;
+                
+                this.canvas.style.maxWidth = '100%';
+            }
+
+            drawOriginalImage() {
+                this.ctx.drawImage(this.originalImage, 0, 0, this.canvas.width, this.canvas.height);
+            }
+
+            storeOriginalImageData() {
+                this.originalImageData = this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height);
+                this.currentImageData = this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height);
+            }
+
+            async applySelectedEffects() {
+                if (this.selectedEffects.size === 0) {
+                    alert('Please select at least one effect');
+                    return;
+                }
+
+                this.setButtonLoading('applyBtn', true);
+                this.resetImage();
+                
+                const effectNames = Array.from(this.selectedEffects);
+                
+                for (const effectName of effectNames) {
+                    await new Promise(resolve => {
+                        setTimeout(() => {
+                            this.applyEffect(effectName);
+                            resolve();
+                        }, 50);
+                    });
+                }
+                
+                this.setButtonLoading('applyBtn', false);
+            }
+
+            applyEffect(effectName) {
+                const imageData = this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height);
+                let newImageData;
+
+                switch (effectName) {
+                    case 'pixelSort':
+                        newImageData = this.pixelSort(imageData);
+                        break;
+                    case 'datamosh':
+                        newImageData = this.datamosh(imageData);
+                        break;
+                    case 'vhsStatic':
+                        newImageData = this.vhsStatic(imageData);
+                        break;
+                    case 'chromatic':
+                        newImageData = this.chromaticAberration(imageData);
+                        break;
+                    case 'ascii':
+                        newImageData = this.asciiOverlay(imageData);
+                        break;
+                    case 'posterize':
+                        newImageData = this.posterize(imageData);
+                        break;
+                    case 'noise':
+                        newImageData = this.addNoise(imageData);
+                        break;
+                    case 'pixelate':
+                        newImageData = this.pixelate(imageData);
+                        break;
+                    case 'invert':
+                        newImageData = this.invert(imageData);
+                        break;
+                    case 'solarize':
+                        newImageData = this.solarize(imageData);
+                        break;
+                    case 'edges':
+                        newImageData = this.edgeDetection(imageData);
+                        break;
+                    case 'wave':
+                        newImageData = this.waveDistortion(imageData);
+                        break;
+                    case 'kaleidoscope':
+                        newImageData = this.kaleidoscope(imageData);
+                        break;
+                    case 'colorCycle':
+                        newImageData = this.colorCycle(imageData);
+                        break;
+                    case 'scanlineOffset':
+                        newImageData = this.scanlineOffset(imageData);
+                        break;
+                    default:
+                        return;
+                }
+
+                if (newImageData) {
+                    this.ctx.putImageData(newImageData, 0, 0);
+                }
+            }
+
+            pixelSort(imageData) {
+                const data = new Uint8ClampedArray(imageData.data);
+                const width = imageData.width;
+                const height = imageData.height;
+
+                for (let y = 0; y < height; y += 4) {
+                    const row = [];
+                    for (let x = 0; x < width; x++) {
+                        const i = (y * width + x) * 4;
+                        const brightness = (data[i] + data[i + 1] + data[i + 2]) / 3;
+                        row.push({ x, brightness, r: data[i], g: data[i + 1], b: data[i + 2], a: data[i + 3] });
+                    }
+
+                    row.sort((a, b) => a.brightness - b.brightness);
+
+                    for (let x = 0; x < width; x++) {
+                        const i = (y * width + x) * 4;
+                        const pixel = row[x];
+                        data[i] = pixel.r;
+                        data[i + 1] = pixel.g;
+                        data[i + 2] = pixel.b;
+                        data[i + 3] = pixel.a;
+                    }
+                }
+
+                return new ImageData(data, width, height);
+            }
+
+            datamosh(imageData) {
+                const data = new Uint8ClampedArray(imageData.data);
+                const width = imageData.width;
+                const height = imageData.height;
+
+                for (let i = 0; i < data.length; i += 4) {
+                    const offset = Math.floor(Math.random() * 200 - 100) * 4;
+                    const sourceIndex = Math.max(0, Math.min(data.length - 4, i + offset));
+                    
+                    if (Math.random() < 0.3) {
+                        data[i] = data[sourceIndex];
+                        data[i + 1] = data[sourceIndex + 1];
+                        data[i + 2] = data[sourceIndex + 2];
+                    }
+                }
+
+                return new ImageData(data, width, height);
+            }
+
+            vhsStatic(imageData) {
+                const data = new Uint8ClampedArray(imageData.data);
+                const width = imageData.width;
+                const height = imageData.height;
+
+                for (let y = 0; y < height; y++) {
+                    if (y % 3 === 0) {
+                        for (let x = 0; x < width; x++) {
+                            const i = (y * width + x) * 4;
+                            data[i] = Math.max(0, data[i] - 30);
+                            data[i + 1] = Math.max(0, data[i + 1] - 30);
+                            data[i + 2] = Math.max(0, data[i + 2] - 30);
+                        }
+                    }
+
+                    if (Math.random() < 0.1) {
+                        for (let x = 0; x < width; x++) {
+                            const i = (y * width + x) * 4;
+                            const noise = Math.random() * 100;
+                            data[i] = Math.min(255, data[i] + noise);
+                            data[i + 1] = Math.min(255, data[i + 1] + noise);
+                            data[i + 2] = Math.min(255, data[i + 2] + noise);
+                        }
+                    }
+                }
+
+                return new ImageData(data, width, height);
+            }
+
+            chromaticAberration(imageData) {
+                const data = new Uint8ClampedArray(imageData.data);
+                const originalData = new Uint8ClampedArray(imageData.data);
+                const width = imageData.width;
+                const height = imageData.height;
+                const shift = 5;
+
+                for (let y = 0; y < height; y++) {
+                    for (let x = 0; x < width; x++) {
+                        const i = (y * width + x) * 4;
+                        
+                        const rIndex = (y * width + Math.max(0, x - shift)) * 4;
+                        const bIndex = (y * width + Math.min(width - 1, x + shift)) * 4;
+                        
+                        data[i] = originalData[rIndex];
+                        data[i + 1] = originalData[i + 1];
+                        data[i + 2] = originalData[bIndex + 2];
+                        data[i + 3] = originalData[i + 3];
+                    }
+                }
+
+                return new ImageData(data, width, height);
+            }
+
+            asciiOverlay(imageData) {
+                const data = new Uint8ClampedArray(imageData.data);
+                const width = imageData.width;
+                const height = imageData.height;
+
+                this.ctx.putImageData(new ImageData(data, width, height), 0, 0);
+                
+                this.ctx.fillStyle = 'rgba(0, 255, 0, 0.7)';
+                this.ctx.font = '12px monospace';
+                
+                const chars = '@%#*+=-:. ';
+                
+                for (let y = 10; y < height; y += 15) {
+                    for (let x = 0; x < width; x += 8) {
+                        const i = (y * width + x) * 4;
+                        const brightness = (data[i] + data[i + 1] + data[i + 2]) / 3;
+                        const charIndex = Math.floor((brightness / 255) * (chars.length - 1));
+                        this.ctx.fillText(chars[charIndex], x, y);
+                    }
+                }
+
+                return this.ctx.getImageData(0, 0, width, height);
+            }
+
+            posterize(imageData) {
+                const data = new Uint8ClampedArray(imageData.data);
+                const levels = 8;
+                const step = 255 / (levels - 1);
+
+                for (let i = 0; i < data.length; i += 4) {
+                    data[i] = Math.round(data[i] / step) * step;
+                    data[i + 1] = Math.round(data[i + 1] / step) * step;
+                    data[i + 2] = Math.round(data[i + 2] / step) * step;
+                }
+
+                return new ImageData(data, imageData.width, imageData.height);
+            }
+
+            addNoise(imageData) {
+                const data = new Uint8ClampedArray(imageData.data);
+
+                for (let i = 0; i < data.length; i += 4) {
+                    if (Math.random() < 0.1) {
+                        const noise = (Math.random() - 0.5) * 100;
+                        data[i] = Math.max(0, Math.min(255, data[i] + noise));
+                        data[i + 1] = Math.max(0, Math.min(255, data[i + 1] + noise));
+                        data[i + 2] = Math.max(0, Math.min(255, data[i + 2] + noise));
+                    }
+                }
+
+                return new ImageData(data, imageData.width, imageData.height);
+            }
+
+            pixelate(imageData) {
+                const data = new Uint8ClampedArray(imageData.data);
+                const width = imageData.width;
+                const height = imageData.height;
+                const blockSize = 8;
+
+                for (let y = 0; y < height; y += blockSize) {
+                    for (let x = 0; x < width; x += blockSize) {
+                        let avgR = 0, avgG = 0, avgB = 0, count = 0;
+                        
+                        for (let dy = 0; dy < blockSize && y + dy < height; dy++) {
+                            for (let dx = 0; dx < blockSize && x + dx < width; dx++) {
+                                const i = ((y + dy) * width + (x + dx)) * 4;
+                                avgR += data[i];
+                                avgG += data[i + 1];
+                                avgB += data[i + 2];
+                                count++;
+                            }
+                        }
+                        
+                        avgR /= count;
+                        avgG /= count;
+                        avgB /= count;
+                        
+                        for (let dy = 0; dy < blockSize && y + dy < height; dy++) {
+                            for (let dx = 0; dx < blockSize && x + dx < width; dx++) {
+                                const i = ((y + dy) * width + (x + dx)) * 4;
+                                data[i] = avgR;
+                                data[i + 1] = avgG;
+                                data[i + 2] = avgB;
+                            }
+                        }
+                    }
+                }
+
+                return new ImageData(data, width, height);
+            }
+
+            invert(imageData) {
+                const data = new Uint8ClampedArray(imageData.data);
+
+                for (let i = 0; i < data.length; i += 4) {
+                    data[i] = 255 - data[i];
+                    data[i + 1] = 255 - data[i + 1];
+                    data[i + 2] = 255 - data[i + 2];
+                }
+
+                return new ImageData(data, imageData.width, imageData.height);
+            }
+
+            solarize(imageData) {
+                const data = new Uint8ClampedArray(imageData.data);
+                const threshold = 128;
+
+                for (let i = 0; i < data.length; i += 4) {
+                    data[i] = data[i] < threshold ? data[i] : 255 - data[i];
+                    data[i + 1] = data[i + 1] < threshold ? data[i + 1] : 255 - data[i + 1];
+                    data[i + 2] = data[i + 2] < threshold ? data[i + 2] : 255 - data[i + 2];
+                }
+
+                return new ImageData(data, imageData.width, imageData.height);
+            }
+
+            edgeDetection(imageData) {
+                const data = new Uint8ClampedArray(imageData.data);
+                const width = imageData.width;
+                const height = imageData.height;
+                const sobelX = [[-1, 0, 1], [-2, 0, 2], [-1, 0, 1]];
+                const sobelY = [[-1, -2, -1], [0, 0, 0], [1, 2, 1]];
+
+                for (let y = 1; y < height - 1; y++) {
+                    for (let x = 1; x < width - 1; x++) {
+                        let gx = 0, gy = 0;
+                        
+                        for (let ky = -1; ky <= 1; ky++) {
+                            for (let kx = -1; kx <= 1; kx++) {
+                                const i = ((y + ky) * width + (x + kx)) * 4;
+                                const gray = (data[i] + data[i + 1] + data[i + 2]) / 3;
+                                gx += gray * sobelX[ky + 1][kx + 1];
+                                gy += gray * sobelY[ky + 1][kx + 1];
+                            }
+                        }
+                        
+                        const magnitude = Math.sqrt(gx * gx + gy * gy);
+                        const i = (y * width + x) * 4;
+                        data[i] = magnitude;
+                        data[i + 1] = magnitude;
+                        data[i + 2] = magnitude;
+                    }
+                }
+
+                return new ImageData(data, width, height);
+            }
+
+            waveDistortion(imageData) {
+                const data = new Uint8ClampedArray(imageData.data);
+                const originalData = new Uint8ClampedArray(imageData.data);
+                const width = imageData.width;
+                const height = imageData.height;
+
+                for (let y = 0; y < height; y++) {
+                    for (let x = 0; x < width; x++) {
+                        const distortion = Math.sin(y * 0.1) * 10;
+                        const sourceX = Math.max(0, Math.min(width - 1, x + distortion));
+                        const sourceY = y;
+                        
+                        const i = (y * width + x) * 4;
+                        const si = (sourceY * width + Math.floor(sourceX)) * 4;
+                        
+                        data[i] = originalData[si];
+                        data[i + 1] = originalData[si + 1];
+                        data[i + 2] = originalData[si + 2];
+                        data[i + 3] = originalData[si + 3];
+                    }
+                }
+
+                return new ImageData(data, width, height);
+            }
+
+            kaleidoscope(imageData) {
+                const data = new Uint8ClampedArray(imageData.data);
+                const originalData = new Uint8ClampedArray(imageData.data);
+                const width = imageData.width;
+                const height = imageData.height;
+                const centerX = width / 2;
+                const centerY = height / 2;
+
+                for (let y = 0; y < height; y++) {
+                    for (let x = 0; x < width; x++) {
+                        const dx = x - centerX;
+                        const dy = y - centerY;
+                        const angle = Math.atan2(dy, dx);
+                        const radius = Math.sqrt(dx * dx + dy * dy);
+                        
+                        const mirroredAngle = Math.abs(angle) % (Math.PI / 3);
+                        const sourceX = Math.floor(centerX + radius * Math.cos(mirroredAngle));
+                        const sourceY = Math.floor(centerY + radius * Math.sin(mirroredAngle));
+                        
+                        if (sourceX >= 0 && sourceX < width && sourceY >= 0 && sourceY < height) {
+                            const i = (y * width + x) * 4;
+                            const si = (sourceY * width + sourceX) * 4;
+                            
+                            data[i] = originalData[si];
+                            data[i + 1] = originalData[si + 1];
+                            data[i + 2] = originalData[si + 2];
+                            data[i + 3] = originalData[si + 3];
+                        }
+                    }
+                }
+
+                return new ImageData(data, width, height);
+            }
+
+            colorCycle(imageData) {
+                const data = new Uint8ClampedArray(imageData.data);
+                const time = Date.now() * 0.01;
+
+                for (let i = 0; i < data.length; i += 4) {
+                    const hue = (time + i * 0.01) % 360;
+                    const rgb = this.hslToRgb(hue / 360, 0.8, 0.5);
+                    
+                    data[i] = (data[i] + rgb[0]) / 2;
+                    data[i + 1] = (data[i + 1] + rgb[1]) / 2;
+                    data[i + 2] = (data[i + 2] + rgb[2]) / 2;
+                }
+
+                return new ImageData(data, imageData.width, imageData.height);
+            }
+
+            scanlineOffset(imageData) {
+                const data = new Uint8ClampedArray(imageData.data);
+                const originalData = new Uint8ClampedArray(imageData.data);
+                const width = imageData.width;
+                const height = imageData.height;
+
+                for (let y = 0; y < height; y++) {
+                    if (y % 10 === 0) {
+                        const offset = Math.floor(Math.random() * 20 - 10);
+                        for (let x = 0; x < width; x++) {
+                            const sourceX = Math.max(0, Math.min(width - 1, x + offset));
+                            const i = (y * width + x) * 4;
+                            const si = (y * width + sourceX) * 4;
+                            
+                            data[i] = originalData[si];
+                            data[i + 1] = originalData[si + 1];
+                            data[i + 2] = originalData[si + 2];
+                            data[i + 3] = originalData[si + 3];
+                        }
+                    }
+                }
+
+                return new ImageData(data, width, height);
+            }
+
+            hslToRgb(h, s, l) {
+                const c = (1 - Math.abs(2 * l - 1)) * s;
+                const x = c * (1 - Math.abs((h * 6) % 2 - 1));
+                const m = l - c / 2;
+                let r, g, b;
+
+                if (h < 1/6) [r, g, b] = [c, x, 0];
+                else if (h < 2/6) [r, g, b] = [x, c, 0];
+                else if (h < 3/6) [r, g, b] = [0, c, x];
+                else if (h < 4/6) [r, g, b] = [0, x, c];
+                else if (h < 5/6) [r, g, b] = [x, 0, c];
+                else [r, g, b] = [c, 0, x];
+
+                return [(r + m) * 255, (g + m) * 255, (b + m) * 255];
+            }
+
+            randomizeEffects() {
+                const allEffects = ['pixelSort', 'datamosh', 'vhsStatic', 'chromatic', 'ascii', 
+                                 'posterize', 'noise', 'pixelate', 'invert', 'solarize', 
+                                 'edges', 'wave', 'kaleidoscope', 'colorCycle', 'scanlineOffset'];
+                
+                const numEffects = Math.floor(Math.random() * 4) + 1;
+                const randomEffects = [];
+                
+                for (let i = 0; i < numEffects; i++) {
+                    const randomEffect = allEffects[Math.floor(Math.random() * allEffects.length)];
+                    if (!randomEffects.includes(randomEffect)) {
+                        randomEffects.push(randomEffect);
+                    }
+                }
+
+                // Clear current selection
+                this.selectedEffects.clear();
+                document.querySelectorAll('.effect-item').forEach(item => {
+                    item.classList.remove('selected');
+                });
+                
+                // Select random effects
+                randomEffects.forEach(effectName => {
+                    this.selectedEffects.add(effectName);
+                    const effectItem = document.querySelector(`[data-effect="${effectName}"]`);
+                    if (effectItem) effectItem.classList.add('selected');
+                });
+                
+                this.updateSelectedCount();
+                this.updateApplyButton();
+                this.syncFallbackSelect();
+                
+                if (this.originalImageData) {
+                    this.applySelectedEffects();
+                }
+            }
+
+            resetImage() {
+                if (this.originalImageData) {
+                    this.ctx.putImageData(this.originalImageData, 0, 0);
+                }
+            }
+
+            downloadImage() {
+                const link = document.createElement('a');
+                link.download = 'picture-glictured.png';
+                link.href = this.canvas.toDataURL();
+                link.click();
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            new PictureGlicture();
+        });
+    </script>
+</body>
+</html>
