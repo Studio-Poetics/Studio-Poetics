@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Vibe Check - What's Your Vibe? ✨</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="game-container">
+        <!-- Start Screen -->
+        <div class="screen" id="start-screen">
+            <div class="title-section">
+                <h1 class="game-title">Vibe Check ✨</h1>
+                <p class="subtitle">What's your vibe? React to scenarios & find out!</p>
+            </div>
+            <div class="start-content">
+                <div class="instructions">
+                    <div class="instruction-item">
+                        <span class="emoji">⚡</span>
+                        <span>React fast or get rekt (3-5 secs)</span>
+                    </div>
+                    <div class="instruction-item">
+                        <span class="emoji">📱</span>
+                        <span>Swipe or tap - it's giving options</span>
+                    </div>
+                    <div class="instruction-item">
+                        <span class="emoji">✨</span>
+                        <span>Discover your main character energy</span>
+                    </div>
+                </div>
+                <button class="start-btn" onclick="startGame()">SLAY THE VIBE CHECK 🔥</button>
+            </div>
+        </div>
+
+        <!-- Game Screen -->
+        <div class="screen hidden" id="game-screen">
+            <div class="game-header">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress-fill"></div>
+                </div>
+                <div class="scenario-count">
+                    <span id="current-scenario">1</span> / <span id="total-scenarios">12</span>
+                </div>
+                <div class="timer-circle" id="timer-circle">
+                    <span id="timer-text">5</span>
+                </div>
+            </div>
+
+            <div class="scenario-container">
+                <div class="scenario-bubble" id="scenario-bubble">
+                    <p id="scenario-text">Loading your first scenario...</p>
+                </div>
+            </div>
+
+            <div class="reaction-zone">
+                <div class="swipe-indicator hidden" id="swipe-indicator">
+                    <div class="swipe-up">
+                        <span class="swipe-emoji">👆</span>
+                        <span class="swipe-label">Swipe up</span>
+                    </div>
+                    <div class="swipe-down">
+                        <span class="swipe-emoji">👇</span>
+                        <span class="swipe-label">Swipe down</span>
+                    </div>
+                </div>
+
+                <div class="emoji-buttons" id="emoji-buttons">
+                    <button class="emoji-btn" data-vibe="chill">😎</button>
+                    <button class="emoji-btn" data-vibe="chaos">🔥</button>
+                    <button class="emoji-btn" data-vibe="emo">😭</button>
+                    <button class="emoji-btn" data-vibe="savage">😤</button>
+                </div>
+            </div>
+
+            <div class="feedback-flash hidden" id="feedback-flash">
+                <span id="feedback-text">Nice choice! 💫</span>
+            </div>
+        </div>
+
+        <!-- Results Screen -->
+        <div class="screen hidden" id="results-screen">
+            <div class="results-content">
+                <h2 class="results-title">Your Vibe Is...</h2>
+                
+                <div class="vibe-card" id="vibe-card">
+                    <div class="vibe-header">
+                        <span class="vibe-emoji" id="vibe-emoji">✨</span>
+                        <h3 class="vibe-name" id="vibe-name">Chill AF</h3>
+                    </div>
+                    <div class="vibe-description" id="vibe-description">
+                        Nothing shakes your vibe. You're basically a human weighted blanket.
+                    </div>
+                    <div class="vibe-percentage">
+                        <span id="vibe-percentage">72%</span> match
+                    </div>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="share-btn" onclick="shareResults()">Share Your Vibe 📱</button>
+                    <button class="play-again-btn" onclick="playAgain()">Play Again ✨</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
