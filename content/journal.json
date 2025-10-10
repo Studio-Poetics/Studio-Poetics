@@ -1,0 +1,24 @@
+{
+  "entries": [
+    {
+      "title": "Exploring New Materials",
+      "slug": "exploring-new-materials",
+      "date": "2023-05-15",
+      "author": "Studio Team",
+      "excerpt": "Our recent exploration into sustainable materials has led to some exciting discoveries.",
+      "content": "Our recent exploration into sustainable materials has led to some exciting discoveries. We've been experimenting with biodegradable polymers and recycled textiles to create objects that are both beautiful and environmentally responsible.\n\nThrough this process, we've developed new techniques for molding and shaping these materials, resulting in forms that challenge conventional aesthetics while maintaining functional integrity.\n\nThe next phase of this research will focus on scaling these techniques for larger production runs without compromising our commitment to sustainability.",
+      "image": "/public/4u6pg.jpg",
+      "tags": ["materials", "sustainability", "research"]
+    },
+    {
+      "title": "Studio Visit: Tokyo Design Week",
+      "slug": "tokyo-design-week",
+      "date": "2023-04-02",
+      "author": "Design Team",
+      "excerpt": "Reflections on our recent visit to Tokyo Design Week and the inspirations we brought back.",
+      "content": "Our team recently returned from Tokyo Design Week, where we were immersed in a vibrant ecosystem of innovative design thinking. The Japanese approach to balancing tradition with cutting-edge technology continues to inspire our work.\n\nParticularly noteworthy was the exhibition on 'Digital Craft,' which showcased how traditional craftsmanship can be enhanced through digital tools without losing the human touch that makes handcrafted objects special.\n\nWe've returned to the studio with fresh perspectives on materiality, form, and the relationship between digital and analog processes. These insights are already informing our current projects and will likely influence our design language for years to come.",
+      "image": "/public/vqrjh.jpg",
+      "tags": ["travel", "inspiration", "exhibition"]
+    }
+  ]
+}

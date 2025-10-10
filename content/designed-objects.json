@@ -1,0 +1,33 @@
+{
+  "objects": [
+    {
+      "title": "Ceramic Vessel No. 3",
+      "slug": "ceramic-vessel-3",
+      "category": "ceramic",
+      "description": "Hand-crafted ceramic vessel with subtle texture variations that catch and reflect light.",
+      "longDescription": "This hand-crafted ceramic vessel is the result of our material exploration into subtle texture variations. Each piece is unique, with slight variations in texture and finish that catch and reflect light in different ways throughout the day. The minimalist form allows the material qualities to take center stage.",
+      "image": "/placeholder.svg?key=do05n",
+      "images": [
+        "/placeholder.svg?key=do05n",
+        "/placeholder.svg?key=do05n-2&height=800&width=800&query=ceramic vessel detail texture",
+        "/placeholder.svg?key=do05n-3&height=800&width=800&query=ceramic vessel in interior setting",
+        "/placeholder.svg?key=do05n-4&height=800&width=800&query=ceramic vessel making process"
+      ],
+      "details": [
+        "Dimensions: 25cm x 15cm x 15cm",
+        "Material: Stoneware clay with matte glaze",
+        "Color: Off-white",
+        "Care: Wipe clean with a damp cloth",
+        "Handmade in our Bangalore studio"
+      ],
+      "relatedProducts": ["paper-light-shade", "linen-wall-hanging", "glass-carafe"]
+    },
+    {
+      "title": "Paper Light Shade",
+      "slug": "paper-light-shade",
+      "category": "paper",
+      "description": "Handmade paper light shade with folded geometric pattern creating intricate shadow play.",
+      "image": "/placeholder.svg?key=fgu7f"
+    }
+  ]
+}

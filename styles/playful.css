@@ -1,0 +1,296 @@
+/* Playful Studio Homepage Styles */
+
+/* Import Google Fonts for typography variety */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Merriweather:ital,wght@0,300;0,400;0,700;1,300;1,400&family=Baloo+2:wght@400;500;600;700&display=swap');
+
+/* Color Variables */
+:root {
+  --coral: #FF5A5F;
+  --mint: #77E1C2;
+  --peach: #FFC8A2;
+  --lilac: #DCC7FF;
+  --off-white: #FBFBFB;
+  --charcoal: #0F0F10;
+  --warm-gray: #6B7280;
+}
+
+/* Typography Updates */
+.font-serif {
+  font-family: 'Merriweather', serif;
+}
+
+.font-rounded {
+  font-family: 'Baloo 2', cursive;
+}
+
+/* Playful button styles */
+.playful-btn {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.playful-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transition: left 0.5s;
+}
+
+.playful-btn:hover::before {
+  left: 100%;
+}
+
+.playful-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+/* Wiggle animation */
+@keyframes wiggle {
+  0% { transform: rotate(0deg); }
+  25% { transform: rotate(-3deg); }
+  50% { transform: rotate(3deg); }
+  75% { transform: rotate(-3deg); }
+  100% { transform: rotate(0deg); }
+}
+
+.wiggle {
+  animation: wiggle 0.5s ease-in-out;
+}
+
+/* Color flood effects */
+.color-flood {
+  position: relative;
+  overflow: hidden;
+  transition: color 0.3s ease;
+}
+
+.color-flood::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: var(--coral);
+  transition: left 0.3s ease;
+  z-index: -1;
+}
+
+.color-flood:hover::after {
+  left: 0;
+}
+
+.color-flood:hover {
+  color: white;
+}
+
+/* Parallax grid background */
+.parallax-grid {
+  background-image: 
+    radial-gradient(circle at 1px 1px, rgba(0,0,0,0.03) 1px, transparent 0);
+  background-size: 24px 24px;
+  background-attachment: fixed;
+}
+
+/* Organic blob animations */
+@keyframes blob-float {
+  0%, 100% { transform: translate(0, 0) scale(1) rotate(0deg); }
+  25% { transform: translate(-20px, -10px) scale(1.1) rotate(90deg); }
+  50% { transform: translate(15px, -25px) scale(0.9) rotate(180deg); }
+  75% { transform: translate(-10px, 10px) scale(1.05) rotate(270deg); }
+}
+
+.floating-blob {
+  animation: blob-float 20s ease-in-out infinite;
+}
+
+/* Squiggly hover effects */
+.squiggly-hover {
+  position: relative;
+}
+
+.squiggly-hover::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 10'%3E%3Cpath d='M0 5 Q 25 0 50 5 T 100 5' stroke='%23FF5A5F' stroke-width='2' fill='none'/%3E%3C/svg%3E") repeat-x;
+  background-size: 20px 10px;
+  opacity: 0;
+  transform: translateY(5px);
+  transition: all 0.3s ease;
+}
+
+.squiggly-hover:hover::after {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Card tilt effects */
+.tilt-card {
+  transition: transform 0.3s ease;
+  transform-style: preserve-3d;
+}
+
+.tilt-card:hover {
+  transform: perspective(1000px) rotateX(5deg) rotateY(-5deg) scale(1.02);
+}
+
+/* Paper texture overlay */
+.paper-texture {
+  position: relative;
+}
+
+.paper-texture::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23000000' fill-opacity='0.02'%3E%3Ccircle cx='30' cy='30' r='1'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E") repeat;
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+/* Soft shadows */
+.soft-shadow {
+  box-shadow: 
+    0 2px 15px -3px rgba(0, 0, 0, 0.07), 
+    0 10px 20px -2px rgba(0, 0, 0, 0.04);
+}
+
+.soft-shadow-hover:hover {
+  box-shadow: 
+    0 10px 30px -3px rgba(0, 0, 0, 0.1), 
+    0 20px 40px -2px rgba(0, 0, 0, 0.06);
+}
+
+/* Text highlight effects */
+.highlight-coral {
+  background: linear-gradient(120deg, var(--coral) 0%, var(--coral) 100%);
+  background-repeat: no-repeat;
+  background-size: 100% 0px;
+  background-position: 0 100%;
+  transition: background-size 0.3s ease;
+}
+
+.highlight-coral:hover {
+  background-size: 100% 100%;
+  color: white;
+}
+
+/* Scroll-based animations */
+@media (prefers-reduced-motion: no-preference) {
+  .scroll-reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.8s ease;
+  }
+  
+  .scroll-reveal.revealed {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Mobile-friendly adjustments */
+@media (max-width: 768px) {
+  .mobile-stack {
+    flex-direction: column;
+  }
+  
+  .mobile-text-center {
+    text-align: center;
+  }
+  
+  .mobile-full-width {
+    width: 100%;
+  }
+}
+
+/* Accessibility improvements */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  :root {
+    --coral: #D63031;
+    --mint: #00B894;
+    --peach: #E17055;
+    --lilac: #A29BFE;
+  }
+}
+
+/* Focus states for accessibility */
+.focusable:focus {
+  outline: 3px solid var(--coral);
+  outline-offset: 2px;
+}
+
+/* Utility classes */
+.rotate-slight {
+  transform: rotate(-3deg);
+}
+
+.rotate-slight-reverse {
+  transform: rotate(3deg);
+}
+
+.scale-on-hover {
+  transition: transform 0.3s ease;
+}
+
+.scale-on-hover:hover {
+  transform: scale(1.05);
+}
+
+/* Gradient text effects */
+.gradient-text {
+  background: linear-gradient(135deg, var(--coral) 0%, var(--mint) 50%, var(--lilac) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  background-size: 200% 200%;
+  animation: gradient-shift 3s ease infinite;
+}
+
+@keyframes gradient-shift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Hide scrollbar for carousel */
+.scrollbar-hide {
+  -ms-overflow-style: none;  /* Internet Explorer 10+ */
+  scrollbar-width: none;  /* Firefox */
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;  /* Safari and Chrome */
+}
+
+/* Line clamp utility */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
