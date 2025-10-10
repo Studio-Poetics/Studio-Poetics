@@ -13,8 +13,6 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
-  assetPrefix: process.env.NODE_ENV === 'production' ? '/Studio-Poetics' : '',
-  basePath: process.env.NODE_ENV === 'production' ? '/Studio-Poetics' : '',
 }
 
 export default nextConfig
