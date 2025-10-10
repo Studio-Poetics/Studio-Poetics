@@ -2,7 +2,7 @@
 
 import Image from "next/image"
 import Link from "next/link"
-import { ArrowRight, Eye, Layers, Zap, Monitor, Building, Home, Museum } from "lucide-react"
+import { ArrowRight, Eye, Layers, Zap, Monitor, Building, Home, Palette } from "lucide-react"
 import { motion } from "framer-motion"
 import { useInView } from "framer-motion"
 import { useRef, useState } from "react"
@@ -49,7 +49,7 @@ export default function HolographicClient() {
   const applications = {
     museums: {
       title: "Museums & Galleries",
-      icon: <Museum className="w-8 h-8" />,
+      icon: <Palette className="w-8 h-8" />,
       description: "Transform static exhibits into dynamic, interactive experiences that adapt to visitor interests.",
       features: [
         "Interactive artifact storytelling",
