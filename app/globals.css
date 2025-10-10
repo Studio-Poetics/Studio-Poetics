@@ -1,0 +1,707 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Merriweather:ital,wght@0,300;0,400;0,700;1,300;1,400&family=Baloo+2:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Onest:wght@100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Proza+Libre:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500;1,600;1,700;1,800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ImageExpansionTypography Styles */
+@font-face {
+  font-family: "Coconat";
+  src: url("/fonts/Coconat-Regular.woff2") format("woff2");
+  font-weight: normal;
+}
+
+@font-face {
+  font-family: "Coconat";
+  src: url("/fonts/Coconat-Demi.woff2") format("woff2");
+  font-weight: 600;
+}
+
+@font-face {
+  font-family: "Coconat";
+  src: url("/fonts/Coconat-Bold.woff2") format("woff2");
+  font-weight: bold;
+}
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 240 10% 3.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 3.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 10% 3.9%;
+    --primary: 240 5.9% 10%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 240 4.8% 95.9%;
+    --secondary-foreground: 240 5.9% 10%;
+    --muted: 240 4.8% 95.9%;
+    --muted-foreground: 240 3.8% 46.1%;
+    --accent: 240 4.8% 95.9%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 5.9% 90%;
+    --input: 240 5.9% 90%;
+    --ring: 240 5.9% 10%;
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 240 10% 3.9%;
+    --foreground: 0 0% 98%;
+    --card: 240 10% 3.9%;
+    --card-foreground: 0 0% 98%;
+    --popover: 240 10% 3.9%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 0 0% 98%;
+    --primary-foreground: 240 5.9% 10%;
+    --secondary: 240 3.7% 15.9%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 240 3.7% 15.9%;
+    --muted-foreground: 240 5% 64.9%;
+    --accent: 240 3.7% 15.9%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 3.7% 15.9%;
+    --input: 240 3.7% 15.9%;
+    --ring: 240 4.9% 83.9%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+    font-family: "Proza Libre", "Helvetica Neue", Arial, system-ui;
+  }
+  
+  /* Apply Bricolage Grotesque to all headers */
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Bricolage Grotesque', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-weight: 600;
+  }
+}
+
+/* Rainbow shimmer effect for buttons */
+@keyframes rainbow-border {
+  0% {
+    border-color: #ff0000;
+  }
+  14% {
+    border-color: #ff8000;
+  }
+  28% {
+    border-color: #ffff00;
+  }
+  42% {
+    border-color: #00ff00;
+  }
+  56% {
+    border-color: #00ffff;
+  }
+  70% {
+    border-color: #0000ff;
+  }
+  84% {
+    border-color: #8000ff;
+  }
+  100% {
+    border-color: #ff0000;
+  }
+}
+
+.rainbow-border-btn {
+  position: relative;
+  z-index: 1;
+  transition: all 0.3s ease;
+}
+
+.rainbow-border-btn:hover {
+  border-width: 2px;
+  animation: rainbow-border 2s linear infinite;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+}
+
+/* Gradient text for Glasscape heading */
+.gradient-text {
+  background: linear-gradient(90deg, #ADFF2F, #32CD32, #00FF7F, #98FB98);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-size: 200% auto;
+  animation: gradient-animation 3s ease infinite;
+}
+
+@keyframes gradient-animation {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* Custom classes using standard CSS to avoid Tailwind arbitrary value syntax issues */
+.accent-bar {
+  width: 3rem;
+  height: 0.25rem;
+  background-color: hsl(var(--accent));
+  margin-bottom: 1rem;
+}
+
+/* Scene and cube styles using standard CSS */
+.scene {
+  width: 100%;
+  height: 16rem; /* h-64 */
+  perspective: 600px;
+}
+
+.cube {
+  position: relative;
+  width: 8rem; /* w-32 */
+  height: 8rem; /* h-32 */
+  margin-left: auto;
+  margin-right: auto;
+  transform-style: preserve-3d;
+}
+
+.cube-face {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.125rem; /* text-lg */
+  font-weight: 700; /* font-bold */
+}
+
+.cube-face-front {
+  background-color: #fb4e4e;
+  color: white;
+  transform: translateZ(64px);
+}
+
+.cube-face-back {
+  background-color: black;
+  color: white;
+  transform: translateZ(-64px) rotateY(180deg);
+}
+
+.cube-face-right {
+  background-color: #4169e1;
+  color: white;
+  transform: translateX(64px) rotateY(90deg);
+}
+
+.cube-face-left {
+  background-color: #8b4513;
+  color: white;
+  transform: translateX(-64px) rotateY(-90deg);
+}
+
+.cube-face-top {
+  background-color: #1f2937; /* gray-800 */
+  color: white;
+  transform: translateY(-64px) rotateX(90deg);
+}
+
+.cube-face-bottom {
+  background-color: #4b5563; /* gray-600 */
+  color: white;
+  transform: translateY(64px) rotateX(-90deg);
+}
+
+@layer components {
+  .rounded-section {
+    @apply rounded-none md:rounded-2xl overflow-hidden;
+  }
+
+  .image-container-rounded {
+    @apply rounded-xl overflow-hidden;
+  }
+
+  .bento-item {
+    @apply bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all;
+  }
+
+  .case-study-header {
+    @apply mb-12;
+  }
+
+  .case-study-meta {
+    @apply grid grid-cols-1 md:grid-cols-4 gap-6 mb-16 border-t border-b py-6;
+  }
+
+  .case-study-meta-item {
+    @apply space-y-2;
+  }
+
+  .case-study-meta-label {
+    @apply text-sm text-gray-500 mb-1;
+  }
+
+  .case-study-meta-value {
+    @apply text-base;
+  }
+
+  .case-study-section {
+    @apply mb-16;
+  }
+
+  .case-study-full-image {
+    @apply relative aspect-[16/9] w-full;
+  }
+
+  .case-study-image-grid {
+    @apply grid grid-cols-1 md:grid-cols-2 gap-6;
+  }
+
+  .case-study-image {
+    @apply relative aspect-[4/3];
+  }
+
+  .case-study-video {
+    @apply relative aspect-video w-full;
+  }
+
+  .nft-display {
+    @apply bg-gray-50 p-8 rounded-2xl mt-8;
+  }
+
+  .nft-grid {
+    @apply grid grid-cols-1 md:grid-cols-3 gap-6;
+  }
+
+  .nft-item {
+    @apply bg-white rounded-lg overflow-hidden shadow-sm border transition-colors duration-300 hover:bg-gray-100;
+  }
+
+  .nft-image {
+    @apply relative aspect-square;
+  }
+
+  .nft-content {
+    @apply p-4;
+  }
+
+  .nft-title {
+    @apply text-lg font-medium mb-1;
+  }
+
+  .nft-price {
+    @apply text-[hsl(var(--accent))] mb-2;
+  }
+
+  .nft-meta {
+    @apply flex justify-between text-xs text-gray-500;
+  }
+
+  .service-item {
+    @apply flex items-center justify-between py-6 border-t border-gray-200 hover:bg-gray-50 transition-colors cursor-pointer;
+  }
+
+  .service-date {
+    @apply text-[#fb4e4e] text-xl w-20;
+  }
+
+  .service-title {
+    @apply flex-1;
+  }
+
+  .service-arrow {
+    @apply text-[#fb4e4e];
+  }
+
+  .service-image {
+    @apply hidden absolute right-0 top-1/2 transform -translate-y-1/2 w-64 h-40 z-10 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none;
+  }
+
+  .audio-player {
+    @apply border border-gray-200 rounded-md p-3;
+  }
+
+  .audio-player-controls {
+    @apply flex items-center gap-2 mb-2;
+  }
+
+  .audio-player-button {
+    @apply w-8 h-8 flex items-center justify-center rounded-full bg-black text-white;
+  }
+
+  .audio-player-progress {
+    @apply h-1 bg-gray-200 rounded-full mb-2 relative;
+  }
+
+  .audio-player-progress-bar {
+    @apply h-full bg-black rounded-full absolute top-0 left-0;
+  }
+
+  .audio-player-time {
+    @apply flex justify-between text-xs text-gray-600;
+  }
+
+  .grid-lines {
+    @apply relative;
+  }
+
+  .video-background {
+    @apply absolute inset-0 w-full h-full object-cover;
+  }
+
+  .video-overlay {
+    @apply absolute inset-0 bg-black/10 z-10;
+  }
+}
+
+/* Bricolage Grotesque Font Class */
+.bricolage-font {
+  font-family: 'Bricolage Grotesque', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-weight: 600;
+  font-size: 2em;
+}
+
+/* Ensure font loading */
+@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,200..800&display=swap');
+
+/* Grid lines using standard CSS instead of Tailwind's arbitrary values */
+.grid-lines::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: linear-gradient(to right, rgba(0, 0, 0, 0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0, 0, 0, 0.03) 1px, transparent 1px);
+  background-size: 48px 48px;
+  pointer-events: none;
+  z-index: -1;
+}
+
+
+/* Zen Garden Game Styles */
+.zen-garden-container {
+  width: 100%;
+  height: 100%;
+  border-radius: 1rem;
+  overflow: hidden;
+  position: relative;
+  background-color: white;
+}
+
+/* Make sure canvas is properly sized */
+canvas {
+  display: block;
+  touch-action: none; /* Prevents scrolling on touch devices when interacting with the canvas */
+  background-color: white;
+}
+
+/* Ensure the game controls are visible but not intrusive */
+.zen-garden-controls {
+  position: absolute;
+  bottom: 1rem;
+  right: 1rem;
+  display: flex;
+  gap: 0.5rem;
+  z-index: 10;
+}
+
+.zen-garden-control-button {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: white;
+  border: 1px solid black;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.zen-garden-control-button:hover {
+  transform: scale(1.1);
+}
+
+.zen-garden-control-button:active {
+  transform: scale(0.95);
+}
+
+.zen-garden-control-button.active {
+  background-color: black;
+  color: white;
+}
+
+.zen-garden-instructions {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  background-color: white;
+  border: 1px solid black;
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+  max-width: 250px;
+  font-size: 0.875rem;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+}
+
+/* Playful Studio Homepage Styles */
+
+/* Typography Updates */
+.font-serif {
+  font-family: 'Merriweather', serif;
+}
+
+.font-rounded {
+  font-family: 'Baloo 2', cursive;
+}
+
+/* Hide scrollbar for carousel */
+.scrollbar-hide {
+  -ms-overflow-style: none;  /* Internet Explorer 10+ */
+  scrollbar-width: none;  /* Firefox */
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;  /* Safari and Chrome */
+}
+
+/* Line clamp utility */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Accessibility improvements */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Reset */
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  background:#ffffff;
+  color:#0b0b0b;
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+}
+
+/* Page frame */
+.page{
+  max-width:1365px;
+  margin:0 auto;
+  padding:22px 32px;
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+}
+
+/* Topbar - brand left, hamburger right */
+.topbar{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+  padding-bottom:10px;
+  flex:0 0 auto;
+}
+.brand{
+  font-weight:900;
+  font-size:18px;
+  letter-spacing:0.12em;
+}
+.hamburger{
+  width:44px;height:34px;border:0;background:transparent;cursor:pointer;
+  display:flex;flex-direction:column;justify-content:center;gap:5px;padding:6px;
+}
+.hamburger span{
+  display:block;height:2px;width:28px;background:#0b0b0b;border-radius:2px;
+}
+
+/* Divider thin rule */
+.divider{
+  height:2px;
+  background:linear-gradient(to right, rgba(0,0,0,0.9) 0 4%, rgba(0,0,0,0.06) 4% 96%, rgba(0,0,0,0.9) 96% 100%);
+  margin-bottom:18px;
+  flex:0 0 auto;
+}
+
+/* HERO: video spans full width on first row,
+   second row contains left-copy and aside (so aside sits next to text) */
+.hero{
+  flex:1 1 auto;
+  display:grid;
+  grid-template-columns: 1fr 320px;   /* main column + aside column */
+  grid-template-rows: auto 1fr;       /* video row, content row */
+  gap:36px;
+  align-items:start;
+  /* ensure entire hero fits above fold:
+     subtract header+divider (approx 22+10+18 = 50px); this keeps hero inside viewport */
+  min-height: calc(100vh - 50px);
+}
+
+/* VIDEO: spans both columns on row 1 */
+.video-wrap{
+  grid-column: 1 / -1;
+  grid-row: 1 / 2;
+  width:100%;
+  /* keep a 16:9 presentation while respecting hero height */
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+.video-el{
+  width:100%;
+  max-height: calc( (100vh - 50px) * 0.8 ); /* around 62% of hero height - tuned so text fits */
+  aspect-ratio: 16 / 9;
+  object-fit:cover;
+  display:block;
+}
+
+/* SECOND ROW: left copy and aside */
+.left-copy{
+  grid-column: 1 / 2;
+  grid-row: 2 / 3;
+  align-self:start;
+  padding-right:8px;
+}
+.left-copy h1{
+  font-size:32px;
+  font-weight:900;
+  margin-bottom:10px;
+  letter-spacing:0.01em;
+}
+.left-copy p{
+  font-size:16px;
+  line-height:1.5;
+  max-width:780px;
+}
+
+/* aside next to left-copy (row 2, col 2) */
+.right-col{
+  grid-column: 2 / 3;
+  grid-row: 2 / 3;
+  align-self:start;
+  display:flex;
+  flex-direction:column;
+  align-items:flex-end;
+  gap:20px;
+  padding-left:8px;
+}
+
+.segments{
+  display:flex;
+  gap:8px;
+  margin-bottom:6px;
+}
+.seg{height:6px;border-radius:3px;background:#eee;}
+.seg.dark{background:#111;width:64px;}
+.seg.light{background:#e0e0e0;width:40px;}
+.seg.red{background:#fb4e4e;width:56px;}
+
+.menu-links{
+  display:flex;
+  flex-direction:column;
+  align-items:flex-end;
+  gap:10px;
+  padding-left:16px;
+  border-left:3px solid rgba(0,0,0,0.08);
+}
+.menu-links a{
+  font-size:14px;
+  color:#0b0b0b;
+  text-decoration:none;
+}
+
+/* Make sure content remains above the fold on standard smaller viewports:
+   when viewport is narrow, stack and reduce video height so text + aside remain visible */
+@media (max-width:1100px){
+  .hero{
+    grid-template-columns: 1fr 260px;
+    gap:22px;
+  }
+  .video-el{ max-height: calc( (100vh - 60px) * 0.56 ); }
+  .left-copy h1{ font-size:28px; }
+}
+
+@media (max-width:880px){
+  /* stack everything: video on top, then text, then menu (aside becomes full width under text) */
+  .hero{
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto;
+    gap:18px;
+    min-height: auto;
+  }
+  .video-wrap{ grid-column:1; grid-row:1; }
+  .left-copy{ grid-column:1; grid-row:2; }
+  .right-col{ grid-column:1; grid-row:3; align-items:flex-start; padding-left:0; border-left:0; }
+  .video-el{ max-height: calc( (100vh - 80px) * 0.5 ); width:100%; }
+}
+
+@media (max-width:520px){
+  .page{ padding-left:18px; padding-right:18px; }
+  .left-copy h1{ font-size:22px; }
+  .video-el{ max-height:40vh; }
+}
+
+/* Hamburger menu styles */
+.hamburger span {
+  transition: all 0.3s ease-in-out;
+}
+
+.hamburger.is-active span:nth-child(1) {
+  transform: translateY(7px) rotate(45deg);
+}
+
+.hamburger.is-active span:nth-child(2) {
+  opacity: 0;
+}
+
+.hamburger.is-active span:nth-child(3) {
+  transform: translateY(-7px) rotate(-45deg);
+}
+
+/* Menu overlay styles */
+.menu-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: white;
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.5s ease-in-out;
+}
+
+.menu-overlay.is-active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.menu-overlay:not(.is-active) {
+  opacity: 0;
+  pointer-events: none;
+}
